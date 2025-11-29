@@ -1,0 +1,40 @@
+# Python / Django
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+*.sqlite3
+*.log
+env/
+venv/
+.env
+*.pot
+*.py[cod]
+
+# Django migrations
+*/migrations/*.pyc
+*/migrations/*.pyo
+*/migrations/__pycache__/
+*/migrations/*.py[cod]
+*/migrations/*.pyo
+db.sqlite3
+
+# Node / frontend
+node_modules/
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-lock.yaml
+
+# Vite cache
+.vite/
+
+# Docker
+*.env
+*.env.*
+docker-compose.override.yml
+docker-compose.override.yaml
+*.pid
+tmp/
+
