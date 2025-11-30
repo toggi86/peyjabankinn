@@ -1,86 +1,96 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import api from '../api/client';
 
-const Matches = () => {
+export default function Matches() {
   const [matches, setMatches] = useState([]);
-  const [guesses, setGuesses] = useState({});
-  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState({}); // track saving per match
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchMatches = async () => {
       try {
-        const resMatches = await api.get('matches/');
-        setMatches(resMatches.data);
-
-        const resGuesses = await api.get('guesses/');
-        const guessMap = {};
-        resGuesses.data.forEach(g => {
-          guessMap[g.match.id] = { guess_home: g.guess_home, guess_away: g.guess_away };
-        });
-        setGuesses(guessMap);
-        setLoading(false);
+        const res = await api.get('matches/');
+        setMatches(res.data);
       } catch (err) {
-        console.error(err);
+        console.error(err.response?.data || err.message);
       }
     };
-    fetchData();
+    fetchMatches();
   }, []);
 
-  const handleGuessChange = (matchId, field, value) => {
-    setGuesses(prev => ({
-      ...prev,
-      [matchId]: { ...prev[matchId], [field]: value }
-    }));
-  };
+  const handleGuessChange = async (id, field, value) => {
+    // Update local state immediately
+    setMatches(prev =>
+      prev.map(match =>
+        match.id === id ? { ...match, [field]: value } : match
+      )
+    );
 
-  const handleSubmitGuess = async (matchId) => {
-    const guess = guesses[matchId];
-    if (!guess || guess.guess_home === undefined || guess.guess_away === undefined) {
-      alert('Please enter both scores');
-      return;
-    }
+    // Show saving indicator
+    setSaving(prev => ({ ...prev, [id]: true }));
 
+    // Auto-save to backend
     try {
-      await api.post('guesses/', {
-        match: matchId,
-        guess_home: parseInt(guess.guess_home),
-        guess_away: parseInt(guess.guess_away)
+      await api.patch(`guesses/${id}/`, {
+        home_guess: field === 'home_guess' ? value : matches.find(m => m.id === id).home_guess,
+        away_guess: field === 'away_guess' ? value : matches.find(m => m.id === id).away_guess,
       });
-      alert('Guess submitted!');
     } catch (err) {
-      console.error(err);
-      alert('Failed to submit guess (maybe you already guessed this match).');
+      console.error(err.response?.data || err.message);
+    } finally {
+      setSaving(prev => ({ ...prev, [id]: false }));
     }
   };
-
-  if (loading) return <p>Loading...</p>;
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Matches</h1>
-      <ul className="space-y-4">
-        {matches.map(m => {
-          const userGuess = guesses[m.id] || {};
-          return (
-            <li key={m.id} className="p-4 bg-white rounded shadow">
-              <strong>{m.team_home.name} vs {m.team_away.name}</strong> <br />
-              <em>{new Date(m.match_date).toLocaleString()}</em> <br />
+    <div className="max-w-xl mx-auto mt-6 space-y-2">
+      <h1 className="text-xl font-bold mb-4">Matches</h1>
 
-              <div className="mt-2 flex items-center gap-2">
-                <input type="number" placeholder="Home" value={userGuess.guess_home || ''} onChange={e => handleGuessChange(m.id, 'guess_home', e.target.value)} className="border p-1 rounded w-16"/>
-                <input type="number" placeholder="Away" value={userGuess.guess_away || ''} onChange={e => handleGuessChange(m.id, 'guess_away', e.target.value)} className="border p-1 rounded w-16"/>
-                <button onClick={() => handleSubmitGuess(m.id)} className="bg-blue-600 text-white px-3 py-1 rounded">Submit</button>
-              </div>
+      {matches.length === 0 && <p>No matches available.</p>}
 
-              {userGuess.guess_home !== undefined && userGuess.guess_away !== undefined && (
-                <p className="mt-2 text-sm text-gray-600">Your guess: {userGuess.guess_home} - {userGuess.guess_away}</p>
-              )}
-            </li>
-          );
-        })}
-      </ul>
+      {matches.map(match => (
+        <div
+          key={match.id}
+          className="flex justify-between items-center border-b py-2"
+        >
+          {/* Date */}
+          <span className="text-sm text-gray-600 w-32">{match.match_date}</span>
+
+          {/* Teams & User Guess */}
+          <span className="flex-1 text-center flex items-center justify-center space-x-2">
+            <span className="font-semibold">{match.team_home.name}</span>
+
+            <input
+              type="number"
+              value={match.home_guess ?? ''}
+              onChange={(e) =>
+                handleGuessChange(match.id, 'home_guess', e.target.value)
+              }
+              className="w-12 border px-1 rounded text-center"
+            />
+            <span>-</span>
+            <input
+              type="number"
+              value={match.away_guess ?? ''}
+              onChange={(e) =>
+                handleGuessChange(match.id, 'away_guess', e.target.value)
+              }
+              className="w-12 border px-1 rounded text-center"
+            />
+
+            <span className="font-semibold">{match.team_away.name}</span>
+
+            {/* Saving indicator */}
+            {saving[match.id] && (
+              <span className="ml-2 text-sm text-gray-400">saving...</span>
+            )}
+          </span>
+
+          {/* Correct Score */}
+          <span className="text-sm text-gray-500 ml-4">
+            ({match.home_score} - {match.away_score})
+          </span>
+        </div>
+      ))}
     </div>
   );
-};
-
-export default Matches;
+}
