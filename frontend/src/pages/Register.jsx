@@ -1,22 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import api from '../api/client';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.jsx';
 
 const Register = () => {
   const [form, setForm] = useState({ username: '', password: '', email: '' });
   const navigate = useNavigate();
+  const { token } = useAuth();
 
   useEffect(() => {
     if (token) navigate('/matches', { replace: true });
   }, [token, navigate]);
 
-  const handleChange = e => setForm({...form, [e.target.name]: e.target.value});
+  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async e => {
     e.preventDefault();
     try {
       await api.post('auth/register/', form);
-      navigate('/login');
+      navigate('/login'); // redirect to login after registration
     } catch (err) {
       alert('Registration failed');
     }

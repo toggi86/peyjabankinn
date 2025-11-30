@@ -1,33 +1,51 @@
-import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Matches from './pages/Matches';
-import Navbar from './components/Navbar';
-import Scores from './pages/Scores';
-import AdminScores from './pages/AdminScores';
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
-const App = () => {
-  const token = localStorage.getItem('accessToken');
+import Login from "./pages/Login.jsx";
+import Register from "./pages/Register.jsx";
+import Matches from "./pages/Matches.jsx";
+import Scores from "./pages/Scores.jsx";
+import AdminScores from "./pages/AdminScores.jsx";
 
+function App() {
   return (
     <div className="min-h-screen bg-gray-100">
-      {token && <Navbar />}
-      <div className="container mx-auto p-4">
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route
-            path="/matches"
-            element={token ? <Matches /> : <Navigate to="/login" replace />}
-          />
-          <Route path="/scores" element={<Scores />} />
-          <Route path="/adminscores" element={<AdminScores />} />
-          <Route path="*" element={<Navigate to={token ? "/matches" : "/login"} replace />} />
-        </Routes>
-      </div>
+      <Navbar /> {/* Always visible */}
+
+      <Routes>
+        {/* Public route */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        {/* Public matches page */}
+        <Route path="/matches" element={<Matches />} />
+
+        {/* Leaderboard: logged-in users only */}
+        <Route
+          path="/scores"
+          element={
+            <ProtectedRoute>
+              <Scores />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Admin scores: staff only */}
+        <Route
+          path="/adminscores"
+          element={
+            <ProtectedRoute staffOnly={true}>
+              <AdminScores />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Catch-all redirects to matches */}
+        <Route path="*" element={<Matches />} />
+      </Routes>
     </div>
   );
-};
+}
 
 export default App;

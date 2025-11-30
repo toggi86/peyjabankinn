@@ -1,59 +1,55 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import api from '../api/client';
+import React from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx";
 
 export default function Navbar() {
-  const token = localStorage.getItem('accessToken');
-  const [user, setUser] = useState(null);
+  const { token, user, logout } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  // Fetch current user if logged in
-  useEffect(() => {
-    if (!token) return;
-
-    const fetchUser = async () => {
-      try {
-        const res = await api.get('auth/me/');
-        setUser(res.data);
-      } catch (err) {
-        console.error(err.response?.data || err.message);
-      }
-    };
-
-    fetchUser();
-  }, [token]);
+  // Hide navbar on login/register pages
+  if (location.pathname === "/login" || location.pathname === "/register") {
+    return null;
+  }
 
   const handleLogout = () => {
-    localStorage.removeItem('accessToken');
-    window.location.href = '/login';
+    logout();
+    navigate("/login", { replace: true }); // redirect after logout
   };
 
   return (
     <nav className="bg-gray-800 text-white p-4 flex justify-between items-center">
       <div className="flex items-center space-x-4">
-        <Link to="/matches" className="hover:underline">Matches</Link>
+        <Link to="/matches" className="hover:underline">
+          Matches
+        </Link>
 
         {token && (
-          <>
-            <Link to="/scores" className="hover:underline">Leaderboard</Link>
-
-            {/* Only show Adminscores if user is staff or superuser */}
-            {user && (user.is_staff || user.is_superuser) && (
-              <Link to="/adminscores" className="hover:underline">Adminscores</Link>
-            )}
-
-            <button
-              onClick={handleLogout}
-              className="hover:underline"
-            >
-              Logout
-            </button>
-          </>
+          <Link to="/scores" className="hover:underline">
+            Leaderboard
+          </Link>
         )}
 
-        {!token && (
+        {token && user?.is_staff && (
+          <Link to="/adminscores" className="hover:underline">
+            Admin Scores
+          </Link>
+        )}
+      </div>
+
+      <div className="flex items-center space-x-4">
+        {token ? (
+          <button onClick={handleLogout} className="hover:underline">
+            Logout
+          </button>
+        ) : (
           <>
-            <Link to="/login" className="hover:underline">Login</Link>
-            <Link to="/register" className="hover:underline">Register</Link>
+            <Link to="/login" className="hover:underline">
+              Login
+            </Link>
+            <Link to="/register" className="hover:underline">
+              Register
+            </Link>
           </>
         )}
       </div>

@@ -2,6 +2,7 @@ import csv
 from django.core.management.base import BaseCommand
 from api.models import Team, Game
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 # Map team names to ISO alpha-2 country codes
 COUNTRY_CODES = {
@@ -57,8 +58,10 @@ class Command(BaseCommand):
                         teams_cache[name] = team
 
                 # --- MATCH ---
-                date_str = f"{row['date']} {row['time']}"  # e.g. "15 January 2026 18:00"
-                match_date = datetime.strptime(date_str, "%d %B %Y %H:%M")
+                date_str = f"{row['date']} {row['time']}"  # "15 January 2026 18:00"
+                local_time = datetime.strptime(date_str, "%d %B %Y %H:%M")
+                local_time = local_time.replace(tzinfo=ZoneInfo("Europe/Copenhagen"))
+                match_date_utc = local_time.astimezone(ZoneInfo("UTC"))
 
                 home_team = teams_cache.get(row["team_home"])
                 away_team = teams_cache.get(row["team_away"])
@@ -68,7 +71,7 @@ class Command(BaseCommand):
                 match, created = Game.objects.get_or_create(
                     team_home=home_team,
                     team_away=away_team,
-                    match_date=match_date,
+                    match_date=match_date_utc,
                     defaults={
                         "venue": row["venue"],
                         "group": row["group"]
