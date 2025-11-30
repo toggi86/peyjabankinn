@@ -1,0 +1,38 @@
+group,date,time,team_home,team_away,venue,flag_home,flag_away
+A,15 January 2026,18:00,Spain,Serbia,Jyske Bank Boxen, Herning,https://upload.wikimedia.org/wikipedia/en/9/9a/Flag_of_Spain.svg,https://upload.wikimedia.org/wikipedia/commons/f/ff/Flag_of_Serbia.svg
+A,15 January 2026,20:30,Germany,Austria,Jyske Bank Boxen, Herning,https://upload.wikimedia.org/wikipedia/en/b/ba/Flag_of_Germany.svg,https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_Austria.svg
+A,17 January 2026,18:00,Austria,Spain,Jyske Bank Boxen, Herning,https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_Austria.svg,https://upload.wikimedia.org/wikipedia/en/9/9a/Flag_of_Spain.svg
+A,17 January 2026,20:30,Serbia,Germany,Jyske Bank Boxen, Herning,https://upload.wikimedia.org/wikipedia/commons/f/ff/Flag_of_Serbia.svg,https://upload.wikimedia.org/wikipedia/en/b/ba/Flag_of_Germany.svg
+A,19 January 2026,18:00,Austria,Serbia,Jyske Bank Boxen, Herning,https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_Austria.svg,https://upload.wikimedia.org/wikipedia/commons/f/ff/Flag_of_Serbia.svg
+A,19 January 2026,20:30,Germany,Spain,Jyske Bank Boxen, Herning,https://upload.wikimedia.org/wikipedia/en/b/ba/Flag_of_Germany.svg,https://upload.wikimedia.org/wikipedia/en/9/9a/Flag_of_Spain.svg
+B,16 January 2026,18:00,Portugal,Romania,Jyske Bank Boxen, Herning,https://upload.wikimedia.org/wikipedia/commons/5/5c/Flag_of_Portugal.svg,https://upload.wikimedia.org/wikipedia/commons/7/73/Flag_of_Romania.svg
+B,16 January 2026,20:30,Denmark,North Macedonia,Jyske Bank Boxen, Herning,https://upload.wikimedia.org/wikipedia/commons/9/9c/Flag_of_Denmark.svg,https://upload.wikimedia.org/wikipedia/commons/f/f8/Flag_of_North_Macedonia.svg
+B,18 January 2026,18:00,North Macedonia,Portugal,Jyske Bank Boxen, Herning,https://upload.wikimedia.org/wikipedia/commons/f/f8/Flag_of_North_Macedonia.svg,https://upload.wikimedia.org/wikipedia/commons/5/5c/Flag_of_Portugal.svg
+B,18 January 2026,20:30,Romania,Denmark,Jyske Bank Boxen, Herning,https://upload.wikimedia.org/wikipedia/commons/7/73/Flag_of_Romania.svg,https://upload.wikimedia.org/wikipedia/commons/9/9c/Flag_of_Denmark.svg
+B,20 January 2026,18:00,North Macedonia,Romania,Jyske Bank Boxen, Herning,https://upload.wikimedia.org/wikipedia/commons/f/f8/Flag_of_North_Macedonia.svg,https://upload.wikimedia.org/wikipedia/commons/7/73/Flag_of_Romania.svg
+B,20 January 2026,20:30,Denmark,Portugal,Jyske Bank Boxen, Herning,https://upload.wikimedia.org/wikipedia/commons/9/9c/Flag_of_Denmark.svg,https://upload.wikimedia.org/wikipedia/commons/5/5c/Flag_of_Portugal.svg
+C,15 January 2026,18:00,France,Czech Republic,Unity Arena, Bærum,https://upload.wikimedia.org/wikipedia/en/c/c3/Flag_of_France.svg,https://upload.wikimedia.org/wikipedia/commons/c/cb/Flag_of_the_Czech_Republic.svg
+C,15 January 2026,20:30,Norway,Ukraine,Unity Arena, Bærum,https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Norway.svg,https://upload.wikimedia.org/wikipedia/commons/4/49/Flag_of_Ukraine.svg
+C,17 January 2026,18:00,Ukraine,France,Unity Arena, Bærum,https://upload.wikimedia.org/wikipedia/commons/4/49/Flag_of_Ukraine.svg,https://upload.wikimedia.org/wikipedia/en/c/c3/Flag_of_France.svg
+C,17 January 2026,20:30,Czech Republic,Norway,Unity Arena, Bærum,https://upload.wikimedia.org/wikipedia/commons/c/cb/Flag_of_the_Czech_Republic.svg,https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Norway.svg
+C,19 January 2026,18:00,Czech Republic,Ukraine,Unity Arena, Bærum,https://upload.wikimedia.org/wikipedia/commons/c/cb/Flag_of_the_Czech_Republic.svg,https://upload.wikimedia.org/wikipedia/commons/4/49/Flag_of_Ukraine.svg
+C,19 January 2026,20:30,France,Norway,Unity Arena, Bærum,https://upload.wikimedia.org/wikipedia/en/c/c3/Flag_of_France.svg,https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Norway.svg
+D,16 January 2026,18:00,Slovenia,Montenegro,Unity Arena, Bærum,https://upload.wikimedia.org/wikipedia/commons/f/f0/Flag_of_Slovenia.svg,https://upload.wikimedia.org/wikipedia/commons/6/63/Flag_of_Montenegro.svg
+D,16 January 2026,20:30,Faroe Islands,Switzerland,Unity Arena, Bærum,https://upload.wikimedia.org/wikipedia/commons/3/3a/Flag_of_the_Faroe_Islands.svg,https://upload.wikimedia.org/wikipedia/commons/f/f3/Flag_of_Switzerland.svg
+D,18 January 2026,18:00,Montenegro,Faroe Islands,Unity Arena, Bærum,https://upload.wikimedia.org/wikipedia/commons/6/63/Flag_of_Montenegro.svg,https://upload.wikimedia.org/wikipedia/commons/3/3a/Flag_of_the_Faroe_Islands.svg
+D,18 January 2026,20:30,Switzerland,Slovenia,Unity Arena, Bærum,https://upload.wikimedia.org/wikipedia/commons/f/f3/Flag_of_Switzerland.svg,https://upload.wikimedia.org/wikipedia/commons/f/f0/Flag_of_Slovenia.svg
+D,20 January 2026,18:00,Montenegro,Switzerland,Unity Arena, Bærum,https://upload.wikimedia.org/wikipedia/commons/6/63/Flag_of_Montenegro.svg,https://upload.wikimedia.org/wikipedia/commons/f/f3/Flag_of_Switzerland.svg
+D,20 January 2026,20:30,Slovenia,Faroe Islands,Unity Arena, Bærum,https://upload.wikimedia.org/wikipedia/commons/f/f0/Flag_of_Slovenia.svg,https://upload.wikimedia.org/wikipedia/commons/3/3a/Flag_of_the_Faroe_Islands.svg
+E,17 January 2026,18:00,Croatia,Georgia,Malmö Arena, Malmö,https://upload.wikimedia.org/wikipedia/commons/3/37/Flag_of_Croatia.svg,https://upload.wikimedia.org/wikipedia/commons/0/0f/Flag_of_Georgia.svg
+E,17 January 2026,20:30,Sweden,Netherlands,Malmö Arena, Malmö,https://upload.wikimedia.org/wikipedia/commons/4/4c/Flag_of_Sweden.svg,https://upload.wikimedia.org/wikipedia/commons/2/20/Flag_of_the_Netherlands.svg
+E,19 January 2026,18:00,Netherlands,Croatia,Malmö Arena, Malmö,https://upload.wikimedia.org/wikipedia/commons/2/20/Flag_of_the_Netherlands.svg,https://upload.wikimedia.org/wikipedia/commons/3/37/Flag_of_Croatia.svg
+E,19 January 2026,20:30,Georgia,Sweden,Malmö Arena, Malmö,https://upload.wikimedia.org/wikipedia/commons/0/0f/Flag_of_Georgia.svg,https://upload.wikimedia.org/wikipedia/commons/4/4c/Flag_of_Sweden.svg
+E,21 January 2026,18:00,Netherlands,Georgia,Malmö Arena, Malmö,https://upload.wikimedia.org/wikipedia/commons/2/20/Flag_of_the_Netherlands.svg,https://upload.wikimedia.org/wikipedia/commons/0/0f/Flag_of_Georgia.svg
+E,21 January 2026,20:30,Sweden,Croatia,Malmö Arena, Malmö,https://upload.wikimedia.org/wikipedia/commons/4/4c/Flag_of_Sweden.svg,https://upload.wikimedia.org/wikipedia/commons/3/37/Flag_of_Croatia.svg
+F,16 January 2026,18:00,Iceland,Italy,Kristianstad Arena, Kristianstad,https://upload.wikimedia.org/wikipedia/commons/0/0f/Flag_of_Iceland.svg,https://upload.wikimedia.org/wikipedia/commons/9/9b/Flag_of_Italy.svg
+F,16 January 2026,20:30,Hungary,Poland,Kristianstad Arena, Kristianstad,https://upload.wikimedia.org/wikipedia/commons/c/c1/Flag_of_Hungary.svg,https://upload.wikimedia.org/wikipedia/commons/1/12/Flag_of_Poland.svg
+F,18 January 2026,18:00,Poland,Iceland,Kristianstad Arena, Kristianstad,https://upload.wikimedia.org/wikipedia/commons/1/12/Flag_of_Poland.svg,https://upload.wikimedia.org/wikipedia/commons/0/0f/Flag_of_Iceland.svg
+F,18 January 2026,20:30,Italy,Hungary,Kristianstad Arena, Kristianstad,https://upload.wikimedia.org/wikipedia/commons/9/9b/Flag_of_Italy.svg,https://upload.wikimedia.org/wikipedia/commons/c/c1/Flag_of_Hungary.svg
+F,20 January 2026,18:00,Poland,Italy,Kristianstad Arena, Kristianstad,https://upload.wikimedia.org/wikipedia/commons/1/12/Flag_of_Poland.svg,https://upload.wikimedia.org/wikipedia/commons/9/9b/Flag_of_Italy.svg
+F,20 January 2026,20:30,Hungary,Iceland,Kristianstad Arena, Kristianstad,https://upload.wikimedia.org/wikipedia/commons/c/c1/Flag_of_Hungary.svg,https://upload.wikimedia.org/wikipedia/commons/0/0f/Flag_of_Iceland.svg
+

@@ -30,7 +30,10 @@ from api.serializers import (
     UserGuessSerializer,
     UserGuessCreateSerializer,
 )
-from api.permissions import IsOwner
+from api.permissions import (
+    IsOwner,
+    IsStaffOrReadOnly
+)
 
 User = get_user_model()
 
@@ -39,10 +42,10 @@ class TeamViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TeamSerializer
     permission_classes = [permissions.AllowAny]
 
-class GameViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Game.objects.all()
+class GameViewSet(viewsets.ModelViewSet):
+    queryset = Game.objects.all().order_by('match_date')
     serializer_class = GameSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsStaffOrReadOnly]
 
 class UserGuessViewSet(viewsets.ModelViewSet):
     queryset = UserGuess.objects.all()

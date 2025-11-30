@@ -5,7 +5,21 @@ User = get_user_model()
 
 class Team(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    flag_url = models.URLField(blank=True, null=True)  # optional image
+    country_code = models.CharField(
+        max_length=2,
+        help_text="ISO 3166-1 alpha-2 code (e.g., 'ES' for Spain, 'DK' for Denmark)",
+        blank=True,
+        null=True,
+    )
+
+    @property
+    def flag_url(self):
+        """
+        Returns the flag image URL from FlagsAPI (https://flagsapi.com/)
+        """
+        if not self.country_code:
+            return None
+        return f"https://flagsapi.com/{self.country_code.upper()}/flat/64.png"
 
     def __str__(self):
         return self.name
@@ -16,6 +30,8 @@ class Game(models.Model):
     match_date = models.DateTimeField()
     score_home = models.PositiveIntegerField(blank=True, null=True)
     score_away = models.PositiveIntegerField(blank=True, null=True)
+    group = models.CharField(max_length=2)
+    venue = models.CharField(max_length=200, blank=True, null=True)
 
     def __str__(self):
         return f"{self.team_home} vs {self.team_away} on {self.match_date}"
@@ -23,8 +39,8 @@ class Game(models.Model):
 class UserGuess(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='guesses')
     match = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='guesses')
-    guess_home = models.PositiveIntegerField()
-    guess_away = models.PositiveIntegerField()
+    guess_home = models.PositiveIntegerField(blank=True, null=True)
+    guess_away = models.PositiveIntegerField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

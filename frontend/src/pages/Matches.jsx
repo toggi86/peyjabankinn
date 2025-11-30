@@ -1,102 +1,188 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import api from '../api/client';
+import debounce from 'lodash.debounce';
 
 export default function Matches() {
   const [matches, setMatches] = useState([]);
   const [saving, setSaving] = useState({});
+  const debouncedRefs = useRef({});
+
+  // Fetch matches and guesses
+  const fetchMatchesAndGuesses = async () => {
+    try {
+      const [matchesRes, guessesRes] = await Promise.all([
+        api.get('matches/'),
+        api.get('guesses/'),
+      ]);
+
+      const guessesMap = {};
+      guessesRes.data.forEach(guess => {
+        guessesMap[guess.match.id] = guess;
+      });
+
+      const merged = matchesRes.data.map(match => ({
+        ...match,
+        user_guess: guessesMap[match.id] || null,
+        guess_home: guessesMap[match.id]?.guess_home ?? '',
+        guess_away: guessesMap[match.id]?.guess_away ?? '',
+      }));
+
+      setMatches(merged);
+    } catch (err) {
+      console.error(err.response?.data || err.message);
+    }
+  };
 
   useEffect(() => {
-    const loadData = async () => {
-      const matchesRes = await api.get("matches/");
-      const guessesRes = await api.get("guesses/");
+    fetchMatchesAndGuesses();
 
-      // Merge guesses into matches
-      const merged = matchesRes.data.map(match => {
-        const guess = guessesRes.data.find(g => g.match.id === match.id);
-        return {
-          ...match,
-          guess_id: guess?.id || null,
-          guess_home: guess?.guess_home ?? "",
-          guess_away: guess?.guess_away ?? ""
-        };
-      });
-      setMatches(merged);
-    };
-    loadData();
+    // Auto-refresh correct scores every 15 seconds
+    const interval = setInterval(async () => {
+      try {
+        const res = await api.get('matches/');
+        setMatches(prev =>
+          prev.map(match => {
+            const updated = res.data.find(m => m.id === match.id);
+            if (!updated) return match;
+            return {
+              ...match,
+              home_score: updated.home_score,
+              away_score: updated.away_score,
+            };
+          })
+        );
+      } catch (err) {
+        console.error(err.response?.data || err.message);
+      }
+    }, 15000); // 15 seconds
+
+    return () => clearInterval(interval);
   }, []);
 
-  // Save on change
-  const handleGuessChange = async (matchId, field, value) => {
+  const handleInputChange = (matchId, field, value) => {
     setMatches(prev =>
-      prev.map(m => m.id === matchId ? { ...m, [field]: value } : m)
+      prev.map(m =>
+        m.id === matchId ? { ...m, [field]: value } : m
+      )
     );
 
-    setSaving(p => ({ ...p, [matchId]: true }));
-
     const match = matches.find(m => m.id === matchId);
-    const payload = {
-      match: matchId,
-      guess_home: field === "guess_home" ? value : match.guess_home,
-      guess_away: field === "guess_away" ? value : match.guess_away
-    };
+    const updatedMatch = { ...match, [field]: value };
+
+    if (!debouncedRefs.current[matchId]) {
+      debouncedRefs.current[matchId] = debounce(saveGuess, 500);
+    }
+
+    debouncedRefs.current[matchId](updatedMatch);
+  };
+
+  const saveGuess = async (match) => {
+    if (!match) return;
+
+    const matchId = match.id;
+    const guessHome = match.guess_home !== '' ? Number(match.guess_home) : null;
+    const guessAway = match.guess_away !== '' ? Number(match.guess_away) : null;
+
+    if (!match.user_guess?.id && (guessHome === null || guessAway === null)) return;
+
+    const payload = { guess_home: guessHome, guess_away: guessAway };
+    setSaving(prev => ({ ...prev, [matchId]: true }));
 
     try {
-      if (match.guess_id) {
-        await api.patch(`guesses/${match.guess_id}/`, payload);
+      let res;
+      if (match.user_guess?.id) {
+        res = await api.patch(`guesses/${match.user_guess.id}/`, payload);
       } else {
-        const res = await api.post(`guesses/`, payload);
-        setMatches(prev => prev.map(m => 
-          m.id === matchId ? { ...m, guess_id: res.data.id } : m
-        ));
+        res = await api.post('guesses/', { match: matchId, ...payload });
       }
+
+      setMatches(prev =>
+        prev.map(m =>
+          m.id === matchId
+            ? {
+                ...m,
+                user_guess: res.data,
+                guess_home: res.data.guess_home,
+                guess_away: res.data.guess_away,
+              }
+            : m
+        )
+      );
+    } catch (err) {
+      console.error(err.response?.data || err.message);
     } finally {
-      setSaving(p => ({ ...p, [matchId]: false }));
+      setSaving(prev => ({ ...prev, [matchId]: false }));
     }
   };
 
   return (
-    <div className="max-w-xl mx-auto mt-6 space-y-2">
+    <div className="max-w-5xl mx-auto mt-6">
       <h1 className="text-xl font-bold mb-4">Matches</h1>
+
+      <div className="grid grid-cols-[150px_150px_40px_50px_50px_40px_150px_80px] gap-2 font-semibold text-sm mb-2">
+        <div>Date</div>
+        <div>Home Team</div>
+        <div></div>
+        <div>Home Guess</div>
+        <div>Away Guess</div>
+        <div></div>
+        <div>Away Team</div>
+        <div>Score</div>
+      </div>
 
       {matches.map(match => (
         <div
           key={match.id}
-          className="grid grid-cols-[120px,1fr,80px] items-center border-b py-2 text-sm"
+          className="grid grid-cols-[150px_150px_40px_50px_50px_40px_150px_80px] items-center gap-2 border-b py-2 text-sm"
         >
-          {/* Date */}
-          <span className="text-gray-500">{match.match_date.split("T")[0]}</span>
+          <div>{new Date(match.match_date).toLocaleString()}</div>
+          <div className="font-semibold">{match.team_home.name}</div>
+          <div>
+            <img
+              src={match.team_home.flag_url}
+              alt={match.team_home.name}
+              className="w-6 h-4"
+            />
+          </div>
 
-          {/* Teams + aligned score inputs */}
-          <div className="grid grid-cols-[1fr,40px,10px,40px,1fr] items-center gap-2 text-center">
-            <b className="text-right pr-2">{match.team_home.name}</b>
-
+          <div>
             <input
               type="number"
               value={match.guess_home}
               onChange={(e) =>
-                handleGuessChange(match.id, "guess_home", e.target.value)
+                handleInputChange(match.id, 'guess_home', e.target.value)
               }
-              className="border rounded text-center w-full"
+              className="w-full border px-1 rounded text-center no-arrows"
             />
+          </div>
 
-            <span>-</span>
-
+          <div>
             <input
               type="number"
               value={match.guess_away}
               onChange={(e) =>
-                handleGuessChange(match.id, "guess_away", e.target.value)
+                handleInputChange(match.id, 'guess_away', e.target.value)
               }
-              className="border rounded text-center w-full"
+              className="w-full border px-1 rounded text-center no-arrows"
             />
-
-            <b className="text-left pl-2">{match.team_away.name}</b>
           </div>
 
-          {/* Correct final score */}
-          <span className="text-gray-400 text-center">
-            ({match.score_home ?? "-"} - {match.score_away ?? "-"})
-          </span>
+          <div>
+            <img
+              src={match.team_away.flag_url}
+              alt={match.team_away.name}
+              className="w-6 h-4"
+            />
+          </div>
+
+          <div className="font-semibold text-right">{match.team_away.name}</div>
+
+          <div className="text-gray-500 text-right">
+            ({match.home_score ?? '-'} - {match.away_score ?? '-'})
+            {saving[match.id] && (
+              <span className="ml-2 text-gray-400 text-xs">saving...</span>
+            )}
+          </div>
         </div>
       ))}
     </div>

@@ -2,9 +2,10 @@ from rest_framework import serializers
 from .models import Team, Game, UserGuess
 
 class TeamSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Team
-        fields = '__all__'
+        fields = ['name', 'country_code', 'flag_url']
 
 class GameSerializer(serializers.ModelSerializer):
     team_home = TeamSerializer(read_only=True)
