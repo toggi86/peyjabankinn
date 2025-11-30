@@ -1,12 +1,35 @@
 from django.contrib.auth import get_user_model
-
-from rest_framework.decorators import api_view, permission_classes
+from django.db.models import (
+    F,
+    Case,
+    When,
+    IntegerField,
+    Value,
+    Count,
+    Sum
+)
+from rest_framework.decorators import (
+    api_view,
+    permission_classes,
+)
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
-from rest_framework import viewsets, permissions
+from rest_framework import (
+    viewsets,
+    permissions,
+)
 
-from api.models import Team, Game, UserGuess
-from api.serializers import TeamSerializer, GameSerializer, UserGuessSerializer, UserGuessCreateSerializer
+from api.models import (
+    Team,
+    Game,
+    UserGuess,
+)
+from api.serializers import (
+    GameSerializer,
+    TeamSerializer,
+    UserGuessSerializer,
+    UserGuessCreateSerializer,
+)
 from api.permissions import IsOwner
 
 User = get_user_model()
@@ -38,64 +61,93 @@ class UserGuessViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 
-
 @api_view(["GET"])
 @permission_classes([IsAuthenticatedOrReadOnly])
 def leaderboard(request):
-    users = User.objects.all()
-    results = []
+    """
+    Optimized leaderboard using database aggregation.
+    Scoring rules:
+      - 1 point: correct result only
+      - 3 points: correct result + one number correct
+      - 5 points: exact score
+    """
 
-    for user in users:
-        guesses = UserGuess.objects.filter(user=user).select_related("match")
-        points = 0
-        exact_correct = 0
-        correct_result_count = 0
-        one_score_correct_count = 0
+    # Annotate each guess with points
+    guesses_with_points = UserGuess.objects.annotate(
+        home_correct=Case(
+            When(guess_home=F('match__score_home'), then=Value(1)),
+            default=Value(0),
+            output_field=IntegerField()
+        ),
+        away_correct=Case(
+            When(guess_away=F('match__score_away'), then=Value(1)),
+            default=Value(0),
+            output_field=IntegerField()
+        ),
+        guess_diff=F('guess_home') - F('guess_away'),
+        real_diff=F('match__score_home') - F('match__score_away')
+    ).annotate(
+        result_correct=Case(
+            When(
+                guess_diff__gt=0, real_diff__gt=0, then=Value(1)
+            ),
+            When(
+                guess_diff__lt=0, real_diff__lt=0, then=Value(1)
+            ),
+            When(
+                guess_diff=0, real_diff=0, then=Value(1)
+            ),
+            default=Value(0),
+            output_field=IntegerField()
+        )
+    ).annotate(
+        points=Case(
+            When(home_correct=1, away_correct=1, then=Value(5)),
+            When(result_correct=1, home_correct=1, then=Value(3)),
+            When(result_correct=1, away_correct=1, then=Value(3)),
+            When(result_correct=1, then=Value(1)),
+            default=Value(0),
+            output_field=IntegerField()
+        ),
+        one_score=Case(
+            When(result_correct=1, then=Case(
+                When(home_correct=1, away_correct=0, then=Value(1)),
+                When(home_correct=0, away_correct=1, then=Value(1)),
+                default=Value(0),
+                output_field=IntegerField()
+            )),
+            default=Value(0),
+            output_field=IntegerField()
+        )
+    )
 
-        for g in guesses:
-            m = g.match
-            if m.score_home is None or m.score_away is None:
-                continue
+    # Aggregate per user
+    users_scores = guesses_with_points.values('user__username').annotate(
+        points=Sum('points'),
+        exact=Sum(Case(
+            When(home_correct=1, away_correct=1, then=1),
+            default=0,
+            output_field=IntegerField()
+        )),
+        one_score=Sum('one_score'),
+        total_guesses=Count('id'),
+        correct_results=Sum('result_correct'),
+    )
 
-            guess_diff = g.guess_home - g.guess_away
-            real_diff = m.score_home - m.score_away
-
-            correct_result = (
-                (guess_diff > 0 and real_diff > 0) or
-                (guess_diff < 0 and real_diff < 0) or
-                (guess_diff == 0 and real_diff == 0)
-            )
-
-            home_correct = g.guess_home == m.score_home
-            away_correct = g.guess_away == m.score_away
-
-            if home_correct and away_correct:
-                points += 5
-                exact_correct += 1
-            elif correct_result and (home_correct or away_correct):
-                points += 3
-                one_score_correct_count += 1
-            elif correct_result:
-                points += 1
-
-            if correct_result:
-                correct_result_count += 1
-
-        total_guesses = guesses.count()
-        accuracy = round((exact_correct / total_guesses) * 100, 1) if total_guesses else 0
-        avg_points = round(points / total_guesses, 2) if total_guesses else 0
-
-        results.append({
-            "user": user.username,
-            "points": points,
-            "exact": exact_correct,
-            "one_score": one_score_correct_count,
-            "total_guesses": total_guesses,
-            "win_percentage": round((correct_result_count / total_guesses) * 100, 1) if total_guesses else 0,
-            "accuracy": accuracy,
-            "avg_points": avg_points,
+    # Add percentages & average points
+    leaderboard_data = []
+    for u in users_scores:
+        total = u['total_guesses'] or 1
+        leaderboard_data.append({
+            "user": u['user__username'],
+            "points": u['points'],
+            "exact": u['exact'],
+            "one_score": u['one_score'],
+            "total_guesses": u['total_guesses'],
+            "win_percentage": round((u['correct_results']/total)*100, 1),
+            "avg_points": round(u['points']/total, 2)
         })
 
-    # Sort by points first, then exact, then win_percentage
-    results.sort(key=lambda x: (-x["points"], -x["exact"], -x["win_percentage"]))
-    return Response(results)
+    # Sort
+    leaderboard_data.sort(key=lambda x: (-x["points"], -x["exact"], -x["win_percentage"]))
+    return Response(leaderboard_data)
