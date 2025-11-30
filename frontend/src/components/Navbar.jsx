@@ -1,20 +1,36 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
-const Navbar = () => {
-  const navigate = useNavigate();
-  const handleLogout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    navigate('/login');
-  };
+export default function Navbar() {
+  const token = localStorage.getItem('accessToken');
 
   return (
-    <nav className="bg-blue-600 text-white p-4 flex justify-between">
-      <Link to="/matches" className="font-bold">Peyjabankinn</Link>
-      <button className="bg-red-500 px-3 py-1 rounded" onClick={handleLogout}>Logout</button>
+    <nav className="bg-gray-800 text-white p-4 flex justify-between items-center">
+      <div className="flex items-center space-x-4">
+        <Link to="/matches" className="hover:underline">Matches</Link>
+
+        {token && (
+          <>
+            <Link to="/scores" className="hover:underline">Leaderboard</Link>
+            <button
+              onClick={() => {
+                localStorage.removeItem('accessToken');
+                window.location.href = '/login';
+              }}
+              className="hover:underline"
+            >
+              Logout
+            </button>
+          </>
+        )}
+
+        {!token && (
+          <>
+            <Link to="/login" className="hover:underline">Login</Link>
+            <Link to="/register" className="hover:underline">Register</Link>
+          </>
+        )}
+      </div>
     </nav>
   );
-};
-
-export default Navbar;
+}

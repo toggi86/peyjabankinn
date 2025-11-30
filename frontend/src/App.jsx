@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Matches from './pages/Matches';
 import Navbar from './components/Navbar';
+import Scores from './pages/Scores';
 
 const App = () => {
   const token = localStorage.getItem('accessToken');
@@ -19,6 +20,7 @@ const App = () => {
             path="/matches"
             element={token ? <Matches /> : <Navigate to="/login" replace />}
           />
+          <Route path="/scores" element={<Scores />} />
           <Route path="*" element={<Navigate to={token ? "/matches" : "/login"} replace />} />
         </Routes>
       </div>
