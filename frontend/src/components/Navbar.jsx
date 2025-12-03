@@ -29,11 +29,15 @@ export default function Navbar() {
             Leaderboard
           </Link>
         )}
+        <Link to="/bonus" className="hover:underline">Bonus</Link>
 
         {token && user?.is_staff && (
           <Link to="/adminscores" className="hover:underline">
             Admin Scores
           </Link>
+        )}
+        {token && user?.is_staff && (
+          <Link to="/admin/bonus" className="hover:underline">Admin Bonus</Link>
         )}
       </div>
 

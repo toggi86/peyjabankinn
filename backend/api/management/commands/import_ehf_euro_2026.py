@@ -1,6 +1,6 @@
 import csv
 from django.core.management.base import BaseCommand
-from api.models import Team, Game
+from api.models import Competition, Team, Game
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -43,6 +43,8 @@ class Command(BaseCommand):
 
             teams_cache = {}
 
+            competition = Competition.objects.get(short_name='Euro 2026')
+
             for row in reader:
                 # --- TEAMS ---
                 for team_field in ["team_home", "team_away"]:
@@ -72,6 +74,7 @@ class Command(BaseCommand):
                     team_home=home_team,
                     team_away=away_team,
                     match_date=match_date_utc,
+                    competition=competition,
                     defaults={
                         "venue": row["venue"],
                         "group": row["group"]

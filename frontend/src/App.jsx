@@ -3,6 +3,8 @@ import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
+import BonusQuestions from "./pages/BonusQuestions.jsx";
+import AdminBonus from "./pages/AdminBonus.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import Matches from "./pages/Matches.jsx";
@@ -37,6 +39,23 @@ function App() {
           element={
             <ProtectedRoute staffOnly={true}>
               <AdminScores />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/bonus"
+          element={
+            <ProtectedRoute>
+              <BonusQuestions />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/bonus"
+          element={
+            <ProtectedRoute staffOnly={true}>
+              <AdminBonus />
             </ProtectedRoute>
           }
         />

@@ -1,68 +1,87 @@
-from django.core.management.base import BaseCommand
-from django.contrib.auth.models import User
-from api.models import Team, Game, UserGuess
-from django.utils import timezone
-from datetime import timedelta
 import random
+from django.core.management.base import BaseCommand
+from django.contrib.auth import get_user_model
+
+from api.models import Game, UserGuess, Competition  # adjust import
+
+User = get_user_model()
 
 class Command(BaseCommand):
-    help = "Generate test users, teams, matches and guesses"
+    help = "Generate test users and guesses for existing matches in the current competition"
 
     def add_arguments(self, parser):
-        parser.add_argument('--users', type=int, default=100, help='Number of users to create')
-        parser.add_argument('--teams', type=int, default=8, help='Number of teams to create')
+        parser.add_argument(
+            '--num_users',
+            type=int,
+            default=5,
+            help='Number of test users to create',
+        )
+        parser.add_argument(
+            '--competition_id',
+            type=int,
+            default=None,
+            help='ID of the competition to use (default: first competition)',
+        )
 
     def handle(self, *args, **options):
-        num_users = options['users']
-        num_teams = options['teams']
+        num_users = options['num_users']
+        competition_id = options['competition_id']
 
-        # --- Users ---
+        # -------------------------
+        # 1) Get competition
+        # -------------------------
+        if competition_id:
+            try:
+                competition = Competition.objects.get(id=competition_id)
+            except Competition.DoesNotExist:
+                self.stdout.write(self.style.ERROR(f"Competition {competition_id} not found"))
+                return
+        else:
+            competition = Competition.objects.first()
+            if not competition:
+                self.stdout.write(self.style.ERROR("No competition found"))
+                return
+
+        matches = Game.objects.filter(competition=competition)
+        if not matches.exists():
+            self.stdout.write(self.style.WARNING("No matches found in this competition"))
+            return
+
+        # -------------------------
+        # 2) Create users
+        # -------------------------
         users = []
-        for i in range(1, num_users + 1):
-            username = f"user{i:03d}"
-            u, created = User.objects.get_or_create(username=username)
+        for i in range(num_users):
+            username = f"testuser{i+1}"
+            user, created = User.objects.get_or_create(
+                username=username,
+                defaults={"email": f"{username}@example.com", "is_active": True}
+            )
             if created:
-                u.set_password("password123")
-                u.save()
-            users.append(u)
-        self.stdout.write(self.style.SUCCESS(f"Created {len(users)} users"))
+                user.set_password("password123")
+                user.save()
+                self.stdout.write(self.style.SUCCESS(f"Created user: {username}"))
+            users.append(user)
 
-        # --- Teams ---
-        team_names = ["Iceland", "Denmark", "Norway", "Sweden", "France", "Germany", "Spain", "Croatia"][:num_teams]
-        teams = []
-        for t in team_names:
-            team, created = Team.objects.get_or_create(name=t)
-            teams.append(team)
-        self.stdout.write(self.style.SUCCESS(f"Created {len(teams)} teams"))
-
-        # --- Matches ---
-        matches = []
-        start_date = timezone.now()
-        for i in range(len(teams)):
-            for j in range(i+1, len(teams)):
-                m, created = Game.objects.get_or_create(
-                    team_home=teams[i],
-                    team_away=teams[j],
-                    match_date=start_date + timedelta(days=len(matches)),
-                    score_home=random.randint(20, 35),
-                    score_away=random.randint(20, 35)
-                )
-                matches.append(m)
-        self.stdout.write(self.style.SUCCESS(f"Created {len(matches)} matches"))
-
-        # --- Guesses ---
-        for idx, user in enumerate(users):
+        # -------------------------
+        # 3) Generate guesses
+        # -------------------------
+        for user in users:
             for match in matches:
-                if idx < 10:
-                    home_guess = match.score_home + random.randint(-2, 2)
-                    away_guess = match.score_away + random.randint(-2, 2)
-                else:
-                    home_guess = random.randint(15, 40)
-                    away_guess = random.randint(15, 40)
+                # Skip if guess already exists
+                if UserGuess.objects.filter(user=user, match=match).exists():
+                    continue
+
+                guess_home = random.randint(0, match.score_home or 5) if match.score_home is not None else random.randint(0, 5)
+                guess_away = random.randint(0, match.score_away or 5) if match.score_away is not None else random.randint(0, 5)
+
                 UserGuess.objects.create(
                     user=user,
                     match=match,
-                    guess_home=home_guess,
-                    guess_away=away_guess
+                    guess_home=guess_home,
+                    guess_away=guess_away
                 )
-        self.stdout.write(self.style.SUCCESS(f"Created {len(users)*len(matches)} guesses"))
+
+            self.stdout.write(self.style.SUCCESS(f"Added guesses for {user.username} ({matches.count()} matches)"))
+
+        self.stdout.write(self.style.SUCCESS(f"Test data generation complete: {num_users} users, {matches.count()} matches each."))

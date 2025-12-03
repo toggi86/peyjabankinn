@@ -1,5 +1,60 @@
 from rest_framework import serializers
-from .models import Team, Game, UserGuess
+
+from .models import (
+    BonusChoices,
+    BonusQuestion,
+    BonusQuestionChoices,
+    Game,
+    Team,
+    UserBonusAnswer,
+    UserGuess,
+)
+
+
+class BonusChoicesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BonusChoices
+        fields = ["id", "choice"]
+
+
+class BonusQuestionChoicesSerializer(serializers.ModelSerializer):
+    choice = BonusChoicesSerializer(read_only=True)
+
+    class Meta:
+        model = BonusQuestionChoices
+        fields = ["id", "choice", "question"]
+
+
+class BonusQuestionSerializer(serializers.ModelSerializer):
+    # List of choices for that question
+    choices = BonusQuestionChoicesSerializer(
+        source="question_choices", many=True, read_only=True
+    )
+
+    correct_answer = serializers.SerializerMethodField()
+
+    class Meta:
+        model = BonusQuestion
+        fields = ["id", "question", "competition", "choices", "correct_answer"]
+
+    def get_correct_answer(self, obj):
+        if obj.correct_choice:
+            return BonusQuestionChoicesSerializer(obj.correct_choice).data
+        return None
+
+
+class UserBonusAnswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserBonusAnswer
+        fields = ["id", "user", "question", "answer"]
+        read_only_fields = ["user"]
+
+    def create(self, validated_data):
+        # Ensure user = request.user
+        validated_data["user"] = self.context["request"].user
+        return super().create(validated_data)
+
+
 
 class TeamSerializer(serializers.ModelSerializer):
 
