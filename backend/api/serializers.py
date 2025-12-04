@@ -4,6 +4,7 @@ from .models import (
     BonusChoices,
     BonusQuestion,
     BonusQuestionChoices,
+    Competition,
     Game,
     Team,
     UserBonusAnswer,
@@ -41,6 +42,12 @@ class BonusQuestionSerializer(serializers.ModelSerializer):
         if obj.correct_choice:
             return BonusQuestionChoicesSerializer(obj.correct_choice).data
         return None
+
+
+class CompetitionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Competition
+        fields = ["id", "name"]
 
 
 class UserBonusAnswerSerializer(serializers.ModelSerializer):

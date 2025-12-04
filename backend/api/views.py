@@ -24,6 +24,7 @@ from api.models import (
     BonusChoices,
     BonusQuestion,
     BonusQuestionChoices,
+    Competition,
     Game,
     Team,
     UserBonusAnswer,
@@ -33,6 +34,7 @@ from api.serializers import (
     BonusChoicesSerializer,
     BonusQuestionSerializer,
     BonusQuestionChoicesSerializer,
+    CompetitionSerializer,
     GameSerializer,
     TeamSerializer,
     UserBonusAnswerSerializer,
@@ -92,6 +94,11 @@ class BonusQuestionViewSet(viewsets.ModelViewSet):
         question.save()
 
         return Response({"status": "correct answer saved"})
+
+
+class CompetitionViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Competition.objects.all()
+    serializer_class = CompetitionSerializer
 
 
 class UserBonusAnswerViewSet(viewsets.ModelViewSet):

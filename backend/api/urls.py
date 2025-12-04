@@ -1,14 +1,15 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
-    TeamViewSet,
-    GameViewSet,
-    UserGuessViewSet,
-    leaderboard,
     BonusChoicesViewSet,
     BonusQuestionViewSet,
     BonusQuestionChoicesViewSet,
+    CompetitionViewSet,
+    GameViewSet,
+    leaderboard,
+    TeamViewSet,
     UserBonusAnswerViewSet,
+    UserGuessViewSet,
 )
 
 router = DefaultRouter()
@@ -19,6 +20,7 @@ router.register("bonus-choices", BonusChoicesViewSet)
 router.register("bonus-questions", BonusQuestionViewSet)
 router.register("bonus-question-choices", BonusQuestionChoicesViewSet)
 router.register("bonus-answers", UserBonusAnswerViewSet, basename="bonus-answers")
+router.register(r"competitions", CompetitionViewSet, basename="competition")
 
 urlpatterns = [
     path('', include(router.urls)),
