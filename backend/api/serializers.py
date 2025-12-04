@@ -28,7 +28,7 @@ class BonusQuestionChoicesSerializer(serializers.ModelSerializer):
 class BonusQuestionSerializer(serializers.ModelSerializer):
     # List of choices for that question
     choices = BonusQuestionChoicesSerializer(
-        source="question_choices", many=True, read_only=True
+        source="available_question_choices", many=True, read_only=True
     )
 
     correct_answer = serializers.SerializerMethodField()
@@ -48,12 +48,13 @@ class UserBonusAnswerSerializer(serializers.ModelSerializer):
         model = UserBonusAnswer
         fields = ["id", "user", "question", "answer"]
         read_only_fields = ["user"]
+    def get_queryset(self):
+        return UserBonusAnswer.objects.filter(user=self.request.user)
 
     def create(self, validated_data):
         # Ensure user = request.user
         validated_data["user"] = self.context["request"].user
         return super().create(validated_data)
-
 
 
 class TeamSerializer(serializers.ModelSerializer):

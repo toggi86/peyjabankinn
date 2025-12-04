@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import api from "../api/client";
 
 const BonusQuestions = () => {
@@ -6,7 +6,11 @@ const BonusQuestions = () => {
   const [answers, setAnswers] = useState({});
   const [loading, setLoading] = useState(true);
 
+  const loadedRef = useRef(false);
+
   useEffect(() => {
+    if (loadedRef.current) return;
+    loadedRef.current = true;
     load();
   }, []);
 
@@ -16,7 +20,12 @@ const BonusQuestions = () => {
       const a = await api.get("bonus-answers/");
 
       const answerMap = {};
-      a.data.forEach((ans) => (answerMap[ans.question] = ans.answer));
+      a.data.forEach((ans) => {
+        answerMap[ans.question] = {
+          answerId: ans.id,
+          choiceId: ans.answer
+        };
+      });
 
       setQuestions(q.data);
       setAnswers(answerMap);
@@ -26,17 +35,13 @@ const BonusQuestions = () => {
     setLoading(false);
   };
 
+
   const submitAnswer = async (questionId, choiceId) => {
     try {
-      // Update or create
-      const existing = Object.keys(answers).includes(String(questionId));
+      const existing = answers[questionId];
 
       if (existing) {
-        const answerId = Object.entries(answers).find(
-          ([qId]) => Number(qId) === Number(questionId)
-        )[1];
-
-        await api.patch(`bonus-answers/${answerId}/`, {
+        await api.patch(`bonus-answers/${existing.answerId}/`, {
           answer: choiceId,
         });
       } else {
@@ -48,9 +53,11 @@ const BonusQuestions = () => {
 
       load();
     } catch (err) {
+      console.error(err);
       alert("Failed to submit answer");
     }
   };
+
 
   if (loading) return <div className="text-center mt-10">Loading...</div>;
 
@@ -63,7 +70,7 @@ const BonusQuestions = () => {
           <h2 className="text-xl font-semibold mb-3">{q.question}</h2>
 
           {q.choices.map((choice) => {
-            const isSelected = answers[q.id] === choice.id;
+            const isSelected = answers[q.id]?.choiceId === choice.id;
 
             return (
               <button

@@ -74,7 +74,7 @@ class UserGuessViewSet(viewsets.ModelViewSet):
 
 
 class BonusQuestionViewSet(viewsets.ModelViewSet):
-    queryset = BonusQuestion.objects.all().order_by("id")
+    queryset = BonusQuestion.objects.all().order_by("id").distinct()
     serializer_class = BonusQuestionSerializer
     permission_classes = [IsStaffOrReadOnly]
 
