@@ -1,27 +1,39 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import api from "../api/client";
 
 const CompetitionContext = createContext();
 
 export const CompetitionProvider = ({ children }) => {
   const [competitions, setCompetitions] = useState([]);
-  const [selectedCompetition, setSelectedCompetition] = useState(null);
 
+  // Load selected competition from localStorage
+  const [selectedCompetition, setSelectedCompetitionState] = useState(() => {
+    const saved = localStorage.getItem("selectedCompetition");
+    return saved ? Number(saved) : null;
+  });
+
+  // Persist selection
   useEffect(() => {
-    const loadCompetitions = async () => {
-      try {
-        const res = await api.get("competitions/");
-        setCompetitions(res.data);
+    if (selectedCompetition !== null) {
+      localStorage.setItem("selectedCompetition", selectedCompetition);
+    }
+  }, [selectedCompetition]);
 
-        // auto-select first if nothing selected yet
-        if (!selectedCompetition && res.data.length) {
+  const setSelectedCompetition = (id) => {
+    setSelectedCompetitionState(id);
+  };
+
+  // Fetch competitions from API
+  useEffect(() => {
+    api.get("competitions/")
+      .then(res => {
+        setCompetitions(res.data);
+        // Pick first competition if none selected yet
+        if (!selectedCompetition && res.data.length > 0) {
           setSelectedCompetition(res.data[0].id);
         }
-      } catch (err) {
-        console.error("Failed to load competitions", err);
-      }
-    };
-    loadCompetitions();
+      })
+      .catch(err => console.error(err));
   }, []);
 
   return (

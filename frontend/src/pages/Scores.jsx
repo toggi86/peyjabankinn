@@ -1,12 +1,39 @@
 import { useEffect, useState } from "react";
 import api from "../api/client";
+import { useCompetition } from "../context/CompetitionContext";
 
 export default function Scores() {
   const [scores, setScores] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { selectedCompetition } = useCompetition();
+
+  const loadScores = async () => {
+    if (!selectedCompetition) return;
+
+    setLoading(true);
+    try {
+      const res = await api.get(`scores/?competition=${selectedCompetition}`);
+      setScores(res.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    api.get("scores/").then(res => setScores(res.data));
-  }, []);
+    // Reset scores on competition change
+    setScores([]);
+    loadScores();
+  }, [selectedCompetition]);
+
+  if (!selectedCompetition) {
+    return <div className="text-center mt-10">Select a competition</div>;
+  }
+
+  if (loading) {
+    return <div className="text-center mt-10">Loading leaderboard...</div>;
+  }
 
   return (
     <div className="max-w-5xl mx-auto mt-8">
@@ -17,13 +44,9 @@ export default function Scores() {
           <tr className="text-left">
             <th className="p-3">#</th>
             <th className="p-3">Player</th>
-
-            {/* Points breakdown */}
             <th className="p-3 text-center">Match Pts</th>
             <th className="p-3 text-center">Bonus Pts</th>
             <th className="p-3 text-center font-bold">Total</th>
-
-            {/* Original columns */}
             <th className="p-3 text-center">Exact</th>
             <th className="p-3 text-center">1 Score</th>
             <th className="p-3 text-center">Correct Bonus</th>
@@ -41,13 +64,9 @@ export default function Scores() {
             >
               <td className="p-3 font-bold">{i + 1}</td>
               <td className="p-3 font-medium">{row.user}</td>
-
-              {/* Points breakdown */}
               <td className="p-3 text-center">{row.match_points}</td>
               <td className="p-3 text-center text-purple-600 font-semibold">{row.bonus_points}</td>
               <td className="p-3 text-center font-bold text-blue-700">{row.points}</td>
-
-              {/* Other stats */}
               <td className="p-3 text-center">{row.exact}</td>
               <td className="p-3 text-center">{row.one_score}</td>
               <td className="p-3 text-center">{row.correct_bonus}</td>

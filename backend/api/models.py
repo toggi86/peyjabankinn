@@ -22,7 +22,7 @@ class BonusChoices(models.Model):
 class BonusQuestion(models.Model):
     question = models.CharField(max_length=500)
     competition = models.ForeignKey(
-        Competition, on_delete=models.SET_NULL, null=True, blank=True
+        Competition, on_delete=models.SET_NULL, null=True, blank=True, db_index=True
     )
 
     # correct answer -- points to a per-question choice row
@@ -105,7 +105,7 @@ class Game(models.Model):
     score_away = models.PositiveIntegerField(blank=True, null=True)
     group = models.CharField(max_length=2)
     venue = models.CharField(max_length=200, blank=True, null=True)
-    competition = models.ForeignKey(Competition, on_delete=models.SET_NULL, null=True, blank=True)
+    competition = models.ForeignKey(Competition, on_delete=models.SET_NULL, null=True, blank=True, db_index=True)
 
     def __str__(self):
         return f"{self.team_home} vs {self.team_away} on {self.match_date}"

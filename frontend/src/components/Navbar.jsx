@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useCompetition } from "../context/CompetitionContext";
@@ -12,17 +12,14 @@ export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const ref = useRef();
 
-  // Hide navbar on login/register pages
-  if (location.pathname === "/login" || location.pathname === "/register") {
-    return null;
-  }
+  if (location.pathname === "/login" || location.pathname === "/register") return null;
 
   const handleLogout = () => {
     logout();
     navigate("/login", { replace: true });
   };
 
-  // Close dropdown if clicked outside
+  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (ref.current && !ref.current.contains(e.target)) {
@@ -37,7 +34,6 @@ export default function Navbar() {
 
   return (
     <nav className="bg-gray-800 text-white p-4 flex justify-between items-center">
-      {/* Left links */}
       <div className="flex items-center space-x-4">
         <Link to="/matches" className="hover:underline">Matches</Link>
         {token && <Link to="/scores" className="hover:underline">Leaderboard</Link>}
@@ -50,7 +46,6 @@ export default function Navbar() {
         )}
       </div>
 
-      {/* Right side */}
       <div className="flex items-center space-x-4">
         {token && competitions.length > 0 && (
           <div className="relative" ref={ref}>
@@ -62,16 +57,16 @@ export default function Navbar() {
             </button>
             {dropdownOpen && (
               <div className="absolute right-0 mt-1 w-48 bg-white text-black border rounded shadow-lg z-50">
-                {competitions.map((comp) => (
+                {competitions.map(c => (
                   <div
-                    key={comp.id}
+                    key={c.id}
+                    className={`px-3 py-2 cursor-pointer hover:bg-gray-200 ${c.id === selectedCompetition ? "font-semibold" : ""}`}
                     onClick={() => {
-                      setSelectedCompetition(comp.id);
+                      setSelectedCompetition(c.id);
                       setDropdownOpen(false);
                     }}
-                    className={`px-3 py-2 cursor-pointer hover:bg-gray-200 ${comp.id === selectedCompetition ? "font-semibold" : ""}`}
                   >
-                    {comp.name}
+                    {c.name}
                   </div>
                 ))}
               </div>

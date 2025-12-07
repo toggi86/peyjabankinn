@@ -8,6 +8,9 @@ from django.db.models import (
     Count,
     Sum
 )
+
+from django_filters.rest_framework import DjangoFilterBackend
+
 from rest_framework.decorators import (
     action,
     api_view,
@@ -20,6 +23,12 @@ from rest_framework import (
     permissions,
 )
 
+from api.filters import (
+    BonusQuestionFilter,
+    GameFilter,
+    UserBonusAnswerFilter,
+    UserGuessFilter,
+)
 from api.models import (
     BonusChoices,
     BonusQuestion,
@@ -57,10 +66,14 @@ class GameViewSet(viewsets.ModelViewSet):
     queryset = Game.objects.all().order_by('match_date')
     serializer_class = GameSerializer
     permission_classes = [IsStaffOrReadOnly]
+    filter_backend = [DjangoFilterBackend]
+    filterset_class = GameFilter
 
 class UserGuessViewSet(viewsets.ModelViewSet):
     queryset = UserGuess.objects.all()
     permission_classes = [permissions.IsAuthenticated, IsOwner]
+    filter_backend = [DjangoFilterBackend]
+    filterset_class = UserGuessFilter
 
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
@@ -68,8 +81,7 @@ class UserGuessViewSet(viewsets.ModelViewSet):
         return UserGuessSerializer
 
     def get_queryset(self):
-        # Users can only see their own guesses
-        return UserGuess.objects.filter(user=self.request.user)
+        return super().get_queryset().filter(user=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -79,6 +91,8 @@ class BonusQuestionViewSet(viewsets.ModelViewSet):
     queryset = BonusQuestion.objects.all().order_by("id").distinct()
     serializer_class = BonusQuestionSerializer
     permission_classes = [IsStaffOrReadOnly]
+    filter_backend = [DjangoFilterBackend]
+    filterset_class = BonusQuestionFilter
 
     @action(detail=True, methods=["post"], permission_classes=[IsStaffOrReadOnly])
     def set_correct(self, request, pk=None):
@@ -103,6 +117,8 @@ class CompetitionViewSet(viewsets.ReadOnlyModelViewSet):
 
 class UserBonusAnswerViewSet(viewsets.ModelViewSet):
     serializer_class = UserBonusAnswerSerializer
+    filter_backend = [DjangoFilterBackend]
+    filterset_class = UserBonusAnswerFilter
 
     def get_queryset(self):
         return UserBonusAnswer.objects.filter(user=self.request.user)
@@ -122,7 +138,6 @@ class BonusQuestionChoicesViewSet(viewsets.ModelViewSet):
     serializer_class = BonusQuestionChoicesSerializer
     permission_classes = [IsStaffOrReadOnly]
 
-
 @api_view(["GET"])
 @permission_classes([IsAuthenticatedOrReadOnly])
 def leaderboard(request):
@@ -132,10 +147,18 @@ def leaderboard(request):
       - Bonus questions (5 points per correct answer)
     """
 
+    # ✅ 0) READ COMPETITION QUERY PARAM
+    competition_id = request.query_params.get("competition")
+
     # --------------------------
-    # 1) MATCH GUESS SCORING
+    # 1) MATCH GUESS SCORING (FILTERED)
     # --------------------------
-    guesses_with_points = UserGuess.objects.annotate(
+    guesses = UserGuess.objects.all()
+
+    if competition_id:
+        guesses = guesses.filter(match__competition_id=competition_id)
+
+    guesses_with_points = guesses.annotate(
         home_correct=Case(
             When(guess_home=F('match__score_home'), then=Value(1)),
             default=Value(0),
@@ -180,7 +203,9 @@ def leaderboard(request):
     # --------------------------
     # 2) AGGREGATE MATCH SCORES PER USER
     # --------------------------
-    match_scores = guesses_with_points.values("user_id", "user__username").annotate(
+    match_scores = guesses_with_points.values(
+        "user_id", "user__username"
+    ).annotate(
         match_points=Sum("points"),
         exact=Sum(Case(
             When(home_correct=1, away_correct=1, then=1),
@@ -192,14 +217,19 @@ def leaderboard(request):
         correct_results=Sum("result_correct"),
     )
 
-    # Convert to dict for quick lookup
     match_by_user = {row["user_id"]: row for row in match_scores}
 
     # --------------------------
-    # 3) BONUS QUESTION SCORING
-    #    → 5 points per correct bonus answer
+    # 3) BONUS QUESTION SCORING (FILTERED)
     # --------------------------
-    bonus_scores = UserBonusAnswer.objects.annotate(
+    bonus_answers = UserBonusAnswer.objects.all()
+
+    if competition_id:
+        bonus_answers = bonus_answers.filter(
+            question__competition_id=competition_id
+        )
+
+    bonus_scores = bonus_answers.annotate(
         is_correct=Case(
             When(answer=F("question__correct_choice"), then=Value(1)),
             default=Value(0),
@@ -228,7 +258,6 @@ def leaderboard(request):
         })
 
         total_points = m["match_points"] + b["total_bonus_points"]
-
         total_guesses = m["total_guesses"] + b["total_bonus"]
 
         win_percentage = (
@@ -262,3 +291,4 @@ def leaderboard(request):
     )
 
     return Response(leaderboard_data)
+
