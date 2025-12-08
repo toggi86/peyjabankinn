@@ -88,5 +88,5 @@ class UserGuessSerializer(serializers.ModelSerializer):
 class UserGuessCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserGuess
-        fields = ['match', 'guess_home', 'guess_away']
+        fields = ['id', 'match', 'guess_home', 'guess_away']
 

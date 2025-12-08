@@ -66,13 +66,13 @@ class GameViewSet(viewsets.ModelViewSet):
     queryset = Game.objects.all().order_by('match_date')
     serializer_class = GameSerializer
     permission_classes = [IsStaffOrReadOnly]
-    filter_backend = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend]
     filterset_class = GameFilter
 
 class UserGuessViewSet(viewsets.ModelViewSet):
     queryset = UserGuess.objects.all()
     permission_classes = [permissions.IsAuthenticated, IsOwner]
-    filter_backend = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend]
     filterset_class = UserGuessFilter
 
     def get_serializer_class(self):
@@ -91,7 +91,7 @@ class BonusQuestionViewSet(viewsets.ModelViewSet):
     queryset = BonusQuestion.objects.all().order_by("id").distinct()
     serializer_class = BonusQuestionSerializer
     permission_classes = [IsStaffOrReadOnly]
-    filter_backend = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend]
     filterset_class = BonusQuestionFilter
 
     @action(detail=True, methods=["post"], permission_classes=[IsStaffOrReadOnly])
@@ -117,7 +117,7 @@ class CompetitionViewSet(viewsets.ReadOnlyModelViewSet):
 
 class UserBonusAnswerViewSet(viewsets.ModelViewSet):
     serializer_class = UserBonusAnswerSerializer
-    filter_backend = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend]
     filterset_class = UserBonusAnswerFilter
 
     def get_queryset(self):
