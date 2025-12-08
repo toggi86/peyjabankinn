@@ -8,7 +8,7 @@ export default function BonusQuestions() {
   const [answers, setAnswers] = useState({});
   const [loading, setLoading] = useState(false);
 
-  // Load questions + user answers for the selected competition
+  // Load questions + user answers for selected competition
   const load = async () => {
     if (!selectedCompetition) return;
 
@@ -34,7 +34,6 @@ export default function BonusQuestions() {
   };
 
   useEffect(() => {
-    // reset state when competition changes
     setQuestions([]);
     setAnswers({});
     load();
@@ -43,25 +42,30 @@ export default function BonusQuestions() {
   const submitAnswer = async (questionId, choiceId) => {
     try {
       const existing = answers[questionId];
+      let res;
+
       if (existing) {
-        await api.patch(`bonus-answers/${existing.answerId}/`, { answer: choiceId });
+        res = await api.patch(`bonus-answers/${existing.answerId}/`, { answer: choiceId });
       } else {
-        await api.post("bonus-answers/", { question: questionId, answer: choiceId });
+        res = await api.post("bonus-answers/", { question: questionId, answer: choiceId });
       }
-      load(); // reload after submission
+
+      // ✅ Update answers state locally — no full reload
+      setAnswers(prev => ({
+        ...prev,
+        [questionId]: {
+          answerId: res.data.id,
+          choiceId,
+        },
+      }));
     } catch (err) {
       console.error(err);
       alert("Failed to submit answer");
     }
   };
 
-  if (!selectedCompetition) {
-    return <div className="text-center mt-10">Select a competition</div>;
-  }
-
-  if (loading) {
-    return <div className="text-center mt-10">Loading bonus questions...</div>;
-  }
+  if (!selectedCompetition) return <div className="text-center mt-10">Select a competition</div>;
+  if (loading) return <div className="text-center mt-10">Loading bonus questions...</div>;
 
   return (
     <div className="max-w-2xl mx-auto p-4 mt-6">
