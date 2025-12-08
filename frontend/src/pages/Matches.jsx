@@ -19,9 +19,6 @@ export default function Matches() {
         api.get(`guesses/?competition=${competitionId}`),
       ]);
 
-      console.log("✅ API MATCHES:", matchesRes.data);
-      console.log("✅ API GUESSES:", guessesRes.data);
-
       // Store guesses in ref
       guessesByMatchId.current = {};
       guessesRes.data.forEach((guess) => {
@@ -73,39 +70,32 @@ export default function Matches() {
 
   // Handle input changes with debouncing
   const handleInputChange = (matchId, field, value) => {
-    // Update local state immediately
     setMatches((prev) =>
       prev.map((m) => (m.id === matchId ? { ...m, [field]: value } : m))
     );
 
-    // Prepare latest payload for save
-    const matchState = matches.find((m) => m.id === matchId) || {};
-    const payload = {
-      matchId,
-      guess_home: field === "guess_home" ? value : matchState.guess_home,
-      guess_away: field === "guess_away" ? value : matchState.guess_away,
-    };
+    const match = matches.find((m) => m.id === matchId);
+    const updatedMatch = { ...match, [field]: value };
 
-    // Initialize debounced function if not yet
     if (!debouncedRefs.current[matchId]) {
       debouncedRefs.current[matchId] = debounce(saveGuess, 500);
     }
 
-    // Call debounced save with latest values
-    debouncedRefs.current[matchId](payload);
+    debouncedRefs.current[matchId](updatedMatch);
   };
 
   // Save guess (POST if new, PATCH if exists)
-  const saveGuess = async ({ matchId, guess_home, guess_away }) => {
-    const payload = {
-      guess_home: guess_home !== "" ? Number(guess_home) : null,
-      guess_away: guess_away !== "" ? Number(guess_away) : null,
-    };
+  const saveGuess = async (match) => {
+    if (!match) return;
+    const matchId = match.id;
+
+    const guessHome = match.guess_home !== "" ? Number(match.guess_home) : null;
+    const guessAway = match.guess_away !== "" ? Number(match.guess_away) : null;
 
     // Ignore if new guess but empty
-    if (!guessesByMatchId.current[matchId] && (payload.guess_home === null || payload.guess_away === null))
-      return;
+    if (!guessesByMatchId.current[matchId] && (guessHome === null || guessAway === null)) return;
 
+    const payload = { guess_home: guessHome, guess_away: guessAway };
     setSaving((prev) => ({ ...prev, [matchId]: true }));
 
     try {
@@ -113,26 +103,20 @@ export default function Matches() {
       let res;
 
       if (existingGuess?.id) {
-        console.log("✅ PATCHING GUESS", existingGuess.id);
+        // PATCH existing guess
         res = await api.patch(`guesses/${existingGuess.id}/`, payload);
       } else {
-        console.log("✅ POSTING NEW GUESS", matchId);
+        // POST new guess
         res = await api.post("guesses/", { match: matchId, ...payload });
       }
 
-      // Update ref immediately
+      // Update ref and state to reflect saved guess
       guessesByMatchId.current[matchId] = res.data;
 
-      // Update UI immediately
       setMatches((prev) =>
         prev.map((m) =>
           m.id === matchId
-            ? {
-                ...m,
-                user_guess: res.data,
-                guess_home: res.data.guess_home,
-                guess_away: res.data.guess_away,
-              }
+            ? { ...m, user_guess: res.data, guess_home: res.data.guess_home, guess_away: res.data.guess_away }
             : m
         )
       );
@@ -163,10 +147,7 @@ export default function Matches() {
       </div>
 
       {matches.map((match) => (
-        <div
-          key={match.id}
-          className="grid grid-cols-[150px_150px_40px_50px_50px_40px_150px_80px] items-center gap-2 border-b py-2 text-sm"
-        >
+        <div key={match.id} className="grid grid-cols-[150px_150px_40px_50px_50px_40px_150px_80px] items-center gap-2 border-b py-2 text-sm">
           <div>{new Date(match.match_date).toLocaleString()}</div>
           <div className="font-semibold">{match.team_home.name}</div>
           <div>
