@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
+import FrontPage from "./pages/FrontPage.jsx";
 import BonusQuestions from "./pages/BonusQuestions.jsx";
 import AdminBonus from "./pages/AdminBonus.jsx";
 import Login from "./pages/Login.jsx";
@@ -17,10 +18,21 @@ function App() {
       <Navbar /> {/* Always visible */}
 
       <Routes>
-        {/* Public route */}
+        {/* Public routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        {/* Public matches page */}
+
+        {/* Front page: logged-in users only */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <FrontPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Matches page: public */}
         <Route path="/matches" element={<Matches />} />
 
         {/* Leaderboard: logged-in users only */}
@@ -33,7 +45,7 @@ function App() {
           }
         />
 
-        {/* Admin scores: staff only */}
+        {/* Admin-only scores */}
         <Route
           path="/adminscores"
           element={
@@ -42,6 +54,8 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* Bonus Questions */}
         <Route
           path="/bonus"
           element={
@@ -51,6 +65,7 @@ function App() {
           }
         />
 
+        {/* Admin bonus questions */}
         <Route
           path="/admin/bonus"
           element={
@@ -60,8 +75,15 @@ function App() {
           }
         />
 
-        {/* Catch-all redirects to matches */}
-        <Route path="*" element={<Matches />} />
+        {/* Catch-all: redirect to front page */}
+        <Route
+          path="*"
+          element={
+            <ProtectedRoute>
+              <FrontPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </div>
   );

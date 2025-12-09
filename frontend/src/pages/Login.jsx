@@ -12,10 +12,9 @@ const Login = () => {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  // Redirect only after user loading finishes
   useEffect(() => {
     if (token && !loading) {
-      navigate("/matches", { replace: true });
+      navigate("/", { replace: true });
     }
   }, [token, loading, navigate]);
 
@@ -43,7 +42,12 @@ const Login = () => {
   }
 
   return (
-    <div className="max-w-sm mx-auto mt-24 bg-white p-6 rounded-xl shadow-md">
+    <div className="max-w-sm mx-auto mt-16 bg-white p-6 rounded-xl shadow-md">
+      {/* Logo */}
+      <div className="flex justify-center mb-6">
+        <img src="/peyjabanki-bw-logo.png" alt="Peyjabanki" className="h-16 w-auto" />
+      </div>
+
       <h1 className="text-3xl font-bold text-center mb-5">Login</h1>
 
       <form onSubmit={handleLogin} className="flex flex-col gap-4">
