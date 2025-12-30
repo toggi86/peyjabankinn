@@ -70,4 +70,11 @@ jobs:
           docker-compose -f docker-compose.prod.yml up -d
           docker-compose exec api python manage.py migrate --noinput
           docker-compose exec api python manage.py collectstatic --noinput
+        envs: |
+          AWS_REGION=eu-west-1
+          AWS_ECR_ACCOUNT=401876438340
+          APP_DIR=~/peyjabankinn
+          API_REPO=peyjabanki-api
+          FRONTEND_REPO=peyjabanki-frontend
+          COMPOSE_FILE=docker-compose.prod.yml
 
