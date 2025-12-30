@@ -59,7 +59,7 @@ jobs:
       uses: appleboy/ssh-action@v0.1.7
       with:
         host: ${{ env.LIGHTSAIL_HOST }}
-        user: ubuntu
+        username: ubuntu
         key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
         script: |
           set -e
