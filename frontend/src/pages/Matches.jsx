@@ -8,8 +8,9 @@ export default function Matches() {
 
   const [matches, setMatches] = useState([]);
   const [saving, setSaving] = useState({});
+  const [errors, setErrors] = useState({}); // per-match error
   const debouncedRefs = useRef({});
-  const guessesByMatchId = useRef({}); // Track existing guesses per match
+  const guessesByMatchId = useRef({});
 
   // Fetch matches + guesses
   const fetchMatchesAndGuesses = async (competitionId) => {
@@ -72,6 +73,21 @@ export default function Matches() {
     return () => clearInterval(interval);
   }, [selectedCompetition]);
 
+  // Clear per-match error automatically after 4 seconds
+  useEffect(() => {
+    const timers = Object.entries(errors).map(([matchId]) => {
+      return setTimeout(() => {
+        setErrors((prev) => {
+          const copy = { ...prev };
+          delete copy[matchId];
+          return copy;
+        });
+      }, 4000);
+    });
+
+    return () => timers.forEach(clearTimeout);
+  }, [errors]);
+
   // Handle input changes with debounce
   const handleInputChange = (matchId, field, value) => {
     setMatches((prev) =>
@@ -88,6 +104,7 @@ export default function Matches() {
     debouncedRefs.current[matchId](updatedMatch);
   };
 
+  // Save guess to backend
   const saveGuess = async (match) => {
     if (!match) return;
     const matchId = match.id;
@@ -131,6 +148,12 @@ export default function Matches() {
         )
       );
     } catch (err) {
+      setErrors((prev) => ({
+        ...prev,
+        [matchId]:
+          err.response?.data?.detail ||
+          "Failed to save guess for this match.",
+      }));
       console.error(err.response?.data || err.message);
     } finally {
       setSaving((prev) => ({ ...prev, [matchId]: false }));
@@ -159,58 +182,64 @@ export default function Matches() {
         </div>
 
         {matches.map((match) => (
-          <div
-            key={match.id}
-            className="grid grid-cols-[150px_150px_40px_50px_50px_40px_150px_80px] items-start gap-2 border-b py-2 text-sm"
-          >
-            <div>{new Date(match.match_date).toLocaleString()}</div>
-            <div className="font-semibold">{match.team_home.name}</div>
-            <div>
-              <img
-                src={match.team_home.flag_url}
-                alt={match.team_home.name}
-                className="w-6 h-4"
-              />
+          <div key={match.id}>
+            <div className="grid grid-cols-[150px_150px_40px_50px_50px_40px_150px_80px] items-start gap-2 border-b py-2 text-sm">
+              <div>{new Date(match.match_date).toLocaleString()}</div>
+              <div className="font-semibold">{match.team_home.name}</div>
+              <div>
+                <img
+                  src={match.team_home.flag_url}
+                  alt={match.team_home.name}
+                  className="w-6 h-4"
+                />
+              </div>
+
+              <div>
+                <input
+                  type="number"
+                  value={match.guess_home}
+                  onChange={(e) =>
+                    handleInputChange(match.id, "guess_home", e.target.value)
+                  }
+                  className="w-full border px-1 rounded text-center no-arrows"
+                />
+              </div>
+
+              <div>
+                <input
+                  type="number"
+                  value={match.guess_away}
+                  onChange={(e) =>
+                    handleInputChange(match.id, "guess_away", e.target.value)
+                  }
+                  className="w-full border px-1 rounded text-center no-arrows"
+                />
+              </div>
+
+              <div>
+                <img
+                  src={match.team_away.flag_url}
+                  alt={match.team_away.name}
+                  className="w-6 h-4"
+                />
+              </div>
+
+              <div className="font-semibold text-right">{match.team_away.name}</div>
+
+              <div className="text-gray-500 text-right">
+                ({match.home_score ?? "-"} - {match.away_score ?? "-"})
+                {saving[match.id] && (
+                  <span className="ml-2 text-gray-400 text-xs">saving…</span>
+                )}
+              </div>
             </div>
 
-            <div>
-              <input
-                type="number"
-                value={match.guess_home}
-                onChange={(e) =>
-                  handleInputChange(match.id, "guess_home", e.target.value)
-                }
-                className="w-full border px-1 rounded text-center no-arrows"
-              />
-            </div>
-
-            <div>
-              <input
-                type="number"
-                value={match.guess_away}
-                onChange={(e) =>
-                  handleInputChange(match.id, "guess_away", e.target.value)
-                }
-                className="w-full border px-1 rounded text-center no-arrows"
-              />
-            </div>
-
-            <div>
-              <img
-                src={match.team_away.flag_url}
-                alt={match.team_away.name}
-                className="w-6 h-4"
-              />
-            </div>
-
-            <div className="font-semibold text-right">{match.team_away.name}</div>
-
-            <div className="text-gray-500 text-right">
-              ({match.home_score ?? "-"} - {match.away_score ?? "-"})
-              {saving[match.id] && (
-                <span className="ml-2 text-gray-400 text-xs">saving…</span>
-              )}
-            </div>
+            {/* Desktop error row */}
+            {errors[match.id] && (
+              <div className="col-span-full text-red-600 text-sm bg-red-50 px-2 py-1 border-b border-red-200">
+                {errors[match.id]}
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -218,10 +247,7 @@ export default function Matches() {
       {/* Mobile Cards */}
       <div className="md:hidden space-y-3">
         {matches.map((match) => (
-          <div
-            key={match.id}
-            className="border rounded p-3 bg-white text-sm"
-          >
+          <div key={match.id} className="border rounded p-3 bg-white text-sm">
             <div className="text-xs text-gray-500 mb-1">
               {new Date(match.match_date).toLocaleString()}
             </div>
@@ -274,6 +300,10 @@ export default function Matches() {
 
             {saving[match.id] && (
               <div className="text-xs text-gray-400 mt-1">saving…</div>
+            )}
+
+            {errors[match.id] && (
+              <div className="text-red-600 text-xs mt-1">{errors[match.id]}</div>
             )}
           </div>
         ))}
