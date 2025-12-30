@@ -7,7 +7,7 @@ User = get_user_model()
 class Competition(models.Model):
     short_name = models.CharField(max_length=20)
     name = models.CharField(max_length=200)
-    start_date = models.DateField()
+    start_date = models.DateTimeField()
 
     def __str__(self):
         return self.name
@@ -44,6 +44,10 @@ class BonusQuestion(models.Model):
     def __str__(self):
         return self.question
 
+    @property
+    def lock_datetime(self):
+        return self.competition.start_date
+
 
 class BonusQuestionChoices(models.Model):
     choice = models.ForeignKey(BonusChoices, on_delete=models.CASCADE)
@@ -74,6 +78,9 @@ class UserBonusAnswer(models.Model):
     def __str__(self):
         return f"{self.user.username} → {self.question} : {self.answer}"
 
+    @property
+    def lock_datetime(self):
+        return self.question.competition.start_date
 
 
 class Team(models.Model):
@@ -122,4 +129,8 @@ class UserGuess(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s guess for {self.match}"
+
+    @property
+    def lock_datetime(self):
+        return self.match.match_date
 

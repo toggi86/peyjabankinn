@@ -8,6 +8,7 @@ from django.db.models import (
     Count,
     Sum
 )
+from django.utils import timezone
 
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -16,6 +17,7 @@ from rest_framework.decorators import (
     api_view,
     permission_classes,
 )
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework import (
@@ -51,8 +53,9 @@ from api.serializers import (
     UserGuessCreateSerializer,
 )
 from api.permissions import (
+    BeforeObjectDatePermission,
     IsOwner,
-    IsStaffOrReadOnly
+    IsStaffOrReadOnly,
 )
 
 User = get_user_model()
@@ -71,7 +74,11 @@ class GameViewSet(viewsets.ModelViewSet):
 
 class UserGuessViewSet(viewsets.ModelViewSet):
     queryset = UserGuess.objects.all()
-    permission_classes = [permissions.IsAuthenticated, IsOwner]
+    permission_classes = [
+        BeforeObjectDatePermission,
+        permissions.IsAuthenticated,
+        IsOwner
+    ]
     filter_backends = [DjangoFilterBackend]
     filterset_class = UserGuessFilter
 
@@ -84,6 +91,9 @@ class UserGuessViewSet(viewsets.ModelViewSet):
         return super().get_queryset().filter(user=self.request.user)
 
     def perform_create(self, serializer):
+        match = serializer.validated_data.get('match')
+        if timezone.now() > match.match_date:
+            raise PermissionDenied("Guesses are locked for this match")
         serializer.save(user=self.request.user)
 
 
@@ -119,9 +129,22 @@ class UserBonusAnswerViewSet(viewsets.ModelViewSet):
     serializer_class = UserBonusAnswerSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = UserBonusAnswerFilter
+    permission_classes = [
+        permissions.IsAuthenticated,
+        IsOwner,
+        BeforeObjectDatePermission,
+    ]
 
     def get_queryset(self):
         return UserBonusAnswer.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        competition = serializer.validated_data["question"].competition
+
+        if timezone.now() > competition.start_date:
+            raise PermissionDenied("Bonus answers are locked once the competition starts.")
+
+        serializer.save(user=self.request.user)
 
     def perform_update(self, serializer):
         serializer.save(user=self.request.user)  # ensure user doesn't change
@@ -147,7 +170,6 @@ def leaderboard(request):
       - Bonus questions (5 points per correct answer)
     """
 
-    # ✅ 0) READ COMPETITION QUERY PARAM
     competition_id = request.query_params.get("competition")
 
     # --------------------------

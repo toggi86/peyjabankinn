@@ -6,7 +6,7 @@ import { useAuth } from "../context/AuthContext.jsx";
 const ProtectedRoute = ({ children, staffOnly = false }) => {
   const { token, user, loading } = useAuth();
 
-  if (loading) {
+  if (loading || (token && !user)) {
     return (
       <div className="flex justify-center items-center h-screen">
         <p className="text-gray-500">Loading...</p>
