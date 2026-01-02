@@ -13,7 +13,7 @@ jobs:
       AWS_REGION: eu-west-1
       AWS_ECR_ACCOUNT: 401876438340
       LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
-      APP_DIR: ~/peyjabankinn
+      APP_DIR: /home/ubuntu/peyjabankinn
       API_REPO: peyjabanki-api
       FRONTEND_REPO: peyjabanki-frontend
       COMPOSE_FILE: docker-compose.prod.yml
@@ -55,26 +55,21 @@ jobs:
         docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$FRONTEND_REPO:latest
 
     # --- Deploy to Lightsail ---
-    - name: Deploy to Lightsail
+    - name: Deploy on Lightsail
       uses: appleboy/ssh-action@v0.1.7
       with:
-        host: ${{ env.LIGHTSAIL_HOST }}
+        host: ${{ secrets.LIGHTSAIL_HOST }}
         username: ubuntu
         key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+        envs: AWS_REGION,AWS_ECR_ACCOUNT,APP_DIR,API_REPO,FRONTEND_REPO,COMPOSE_FILE
         script: |
           set -e
+          echo "AWS_REGION=$AWS_REGION"
           cd $APP_DIR
           aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com
           docker pull $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$API_REPO:latest
           docker pull $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$FRONTEND_REPO:latest
-          docker-compose -f docker-compose.prod.yml up -d
+          docker-compose -f $COMPOSE_FILE up -d
           docker-compose exec api python manage.py migrate --noinput
           docker-compose exec api python manage.py collectstatic --noinput
-        envs: |
-          AWS_REGION=eu-west-1
-          AWS_ECR_ACCOUNT=401876438340
-          APP_DIR=~/peyjabankinn
-          API_REPO=peyjabanki-api
-          FRONTEND_REPO=peyjabanki-frontend
-          COMPOSE_FILE=docker-compose.prod.yml
 
