@@ -12,15 +12,15 @@ services:
       - DEBUG=0
       - ALLOWED_HOSTS=*
     volumes:
-      - static_volume:/app/static  # persist Django static files for admin
+      - static_volume:/app/static
     depends_on:
       - db
 
-  # Frontend (React + Nginx)
+  # Frontend + Nginx
   frontend:
     image: 401876438340.dkr.ecr.eu-west-1.amazonaws.com/peyjabanki-frontend:latest
     ports:
-      - "80:80"
+      - "80:80"    # Only needed for redirect to HTTPS
       - "443:443"
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt:ro
