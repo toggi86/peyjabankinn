@@ -5,12 +5,12 @@ services:
   api:
     image: 401876438340.dkr.ecr.eu-west-1.amazonaws.com/peyjabanki-api:latest
     environment:
+      - DEBUG=0
+      - ALLOWED_HOSTS=peyjabanki.com,www.peyjabanki.com
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - SECRET_KEY=${SECRET_KEY}
-      - DEBUG=0
-      - ALLOWED_HOSTS=*
     volumes:
       - static_volume:/app/static
     depends_on:
