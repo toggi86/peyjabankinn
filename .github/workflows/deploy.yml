@@ -23,7 +23,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      # 2️⃣ Configure AWS credentials (for ECR push)
+      # 2️⃣ Configure AWS credentials
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -31,53 +31,53 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      # 3️⃣ Build & push backend
-      - name: Build backend image
+      # 3️⃣ Login to ECR
+      - name: Login to ECR
+        run: |
+          aws ecr get-login-password \
+            --region $AWS_REGION | \
+            docker login \
+            --username AWS \
+            --password-stdin $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com
+
+      # 4️⃣ Build & push backend
+      - name: Build and push backend
         run: |
           docker build -t $API_REPO ./backend
           docker tag $API_REPO:latest $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$API_REPO:latest
-
-      - name: Push backend to ECR
-        run: |
           docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$API_REPO:latest
 
-      # 4️⃣ Build & push frontend
-      - name: Build frontend image
+      # 5️⃣ Build & push frontend
+      - name: Build and push frontend
         run: |
           docker build -t $FRONTEND_REPO ./frontend
           docker tag $FRONTEND_REPO:latest $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$FRONTEND_REPO:latest
-
-      - name: Push frontend to ECR
-        run: |
           docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$FRONTEND_REPO:latest
 
-      # 5️⃣ Deploy to Lightsail
+      # 6️⃣ Deploy to Lightsail
       - name: Deploy on Lightsail
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ubuntu
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-          envs: AWS_REGION,AWS_ECR_ACCOUNT,APP_DIR,API_REPO,FRONTEND_REPO,COMPOSE_FILE,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY
+          envs: AWS_REGION,AWS_ECR_ACCOUNT,APP_DIR,API_REPO,FRONTEND_REPO,COMPOSE_FILE
           script: |
             set -e
+            echo "Deploying to $LIGHTSAIL_HOST..."
             cd $APP_DIR
 
-            # Install AWS CLI if missing
-            if ! command -v aws >/dev/null 2>&1; then
-              echo "Installing AWS CLI..."
-              sudo apt update
-              sudo apt install -y awscli
-            fi
-
-            # Login to ECR on Lightsail
+            # Re-login to ECR on Lightsail (required for docker pull)
             aws ecr get-login-password --region $AWS_REGION | \
               docker login --username AWS --password-stdin $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com
 
+            # Pull latest images from ECR
+            docker pull $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$API_REPO:latest
+            docker pull $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$FRONTEND_REPO:latest
+
             # Recreate containers
-            docker-compose -f $COMPOSE_FILE pull
             docker-compose -f $COMPOSE_FILE up -d --force-recreate
 
-            # Run migrations & collect static
+            # Run Django migrations & collectstatic
             docker-compose exec api python manage.py migrate --noinput
             docker-compose exec api python manage.py collectstatic --noinput
