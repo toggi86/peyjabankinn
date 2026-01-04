@@ -76,7 +76,8 @@ jobs:
             docker pull $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$FRONTEND_REPO:latest
 
             # Recreate containers
-            docker-compose -f $COMPOSE_FILE up -d --force-recreate
+            docker-compose -f $COMPOSE_FILE down --remove-orphans
+            docker-compose -f $COMPOSE_FILE up -d
 
             # Run Django migrations & collectstatic
             docker-compose exec api python manage.py migrate --noinput
