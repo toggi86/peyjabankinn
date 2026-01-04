@@ -13,7 +13,7 @@ export default function Frontpage() {
       <img
         src="/peyjabanki-bw-logo.png"
         alt={t("common.brandName")}
-        className="h-20 mb-6 drop-shadow-md"
+        className="h-28 mb-6 drop-shadow-md"
       />
 
       {/* Welcome message */}
