@@ -257,7 +257,7 @@ def leaderboard(request):
             default=Value(0),
             output_field=IntegerField()
         ),
-        bonus_points=F("is_correct") * 5
+        bonus_points=F("is_correct") * 6
     ).values("user_id").annotate(
         total_bonus_points=Sum("bonus_points"),
         correct_bonus=Sum("is_correct"),
@@ -280,18 +280,6 @@ def leaderboard(request):
         })
 
         total_points = m["match_points"] + b["total_bonus_points"]
-        total_guesses = m["total_guesses"] + b["total_bonus"]
-
-        win_percentage = (
-            round((m["correct_results"] / total_guesses) * 100, 1)
-            if total_guesses > 0 else 0
-        )
-
-        avg_points = (
-            round(total_points / total_guesses, 2)
-            if total_guesses > 0 else 0
-        )
-
         leaderboard_data.append({
             "user": m["user__username"],
             "points": total_points,
@@ -299,17 +287,14 @@ def leaderboard(request):
             "bonus_points": b["total_bonus_points"],
             "exact": m["exact"],
             "one_score": m["one_score"],
-            "correct_bonus": b["correct_bonus"],
-            "total_guesses": total_guesses,
-            "win_percentage": win_percentage,
-            "avg_points": avg_points,
+            "correct_bonus": b["correct_bonus"]
         })
 
     # --------------------------
     # 5) SORT LEADERBOARD
     # --------------------------
     leaderboard_data.sort(
-        key=lambda x: (-x["points"], -x["exact"], -x["win_percentage"])
+        key=lambda x: (-x["points"], -x["exact"])
     )
 
     return Response(leaderboard_data)

@@ -41,12 +41,9 @@
     "matchPoints": "Leikstig",
     "bonusPoints": "Bónusstig",
     "total": "Samtals",
-    "exact": "Nákvæmt",
-    "oneScore": "1 stig",
-    "correctBonus": "Réttur bónus",
-    "totalGuesses": "Heildartilraunir",
-    "winPercentage": "Sigur %",
-    "avgPoints": "Meðalstig"
+    "exact": "Báðar réttar",
+    "oneScore": "Önnur rétt",
+    "correctBonus": "Réttur bónus"
   },
   "frontpage": {
     "welcome": "Velkomin!",

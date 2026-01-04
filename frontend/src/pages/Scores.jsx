@@ -57,15 +57,12 @@ export default function Scores() {
             <tr className="text-left text-sm">
               <th className="p-3">#</th>
               <th className="p-3">{t("leaderboard.player")}</th>
+              <th className="p-3 text-center font-bold">{t("leaderboard.total")}</th>
               <th className="p-3 text-center">{t("leaderboard.matchPoints")}</th>
               <th className="p-3 text-center">{t("leaderboard.bonusPoints")}</th>
-              <th className="p-3 text-center font-bold">{t("leaderboard.total")}</th>
               <th className="p-3 text-center">{t("leaderboard.exact")}</th>
               <th className="p-3 text-center">{t("leaderboard.oneScore")}</th>
               <th className="p-3 text-center">{t("leaderboard.correctBonus")}</th>
-              <th className="p-3 text-center">{t("leaderboard.totalGuesses")}</th>
-              <th className="p-3 text-center">{t("leaderboard.winPercentage")}</th>
-              <th className="p-3 text-center">{t("leaderboard.avgPoints")}</th>
             </tr>
           </thead>
 
@@ -79,19 +76,16 @@ export default function Scores() {
               >
                 <td className="p-3 font-bold">{i + 1}</td>
                 <td className="p-3 font-medium">{row.user}</td>
+                <td className="p-3 text-center font-bold text-blue-700">
+                  {row.points}
+                </td>
                 <td className="p-3 text-center">{row.match_points}</td>
                 <td className="p-3 text-center text-purple-600 font-semibold">
                   {row.bonus_points}
                 </td>
-                <td className="p-3 text-center font-bold text-blue-700">
-                  {row.points}
-                </td>
                 <td className="p-3 text-center">{row.exact}</td>
                 <td className="p-3 text-center">{row.one_score}</td>
                 <td className="p-3 text-center">{row.correct_bonus}</td>
-                <td className="p-3 text-center">{row.total_guesses}</td>
-                <td className="p-3 text-center">{row.win_percentage}%</td>
-                <td className="p-3 text-center">{row.avg_points}</td>
               </tr>
             ))}
           </tbody>
@@ -138,18 +132,6 @@ export default function Scores() {
               <div className="flex justify-between">
                 <span>{t("leaderboard.correctBonus")}:</span>
                 <span>{row.correct_bonus}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>{t("leaderboard.totalGuesses")}:</span>
-                <span>{row.total_guesses}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>{t("leaderboard.winPercentage")}:</span>
-                <span>{row.win_percentage}%</span>
-              </div>
-              <div className="flex justify-between">
-                <span>{t("leaderboard.avgPoints")}:</span>
-                <span>{row.avg_points}</span>
               </div>
             </div>
           </div>

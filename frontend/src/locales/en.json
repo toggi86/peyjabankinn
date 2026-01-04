@@ -41,12 +41,9 @@
     "matchPoints": "Match Pts",
     "bonusPoints": "Bonus Pts",
     "total": "Total",
-    "exact": "Exact",
-    "oneScore": "1 Score",
-    "correctBonus": "Correct Bonus",
-    "totalGuesses": "Total Guesses",
-    "winPercentage": "Win %",
-    "avgPoints": "Avg Pts"
+    "exact": "Both correct",
+    "oneScore": "One correct",
+    "correctBonus": "Correct Bonus"
   },
   "frontpage": {
     "welcome": "Welcome!",
