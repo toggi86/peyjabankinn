@@ -1,0 +1,11 @@
+{
+  "matches": "Matches",
+  "leaderboard": "Leaderboard",
+  "bonus": "Bonus",
+  "admin_scores": "Admin Scores",
+  "admin_bonus": "Admin Bonus",
+  "logout": "Logout",
+  "login": "Login",
+  "register": "Register",
+  "select_competition": "Select Competition"
+}

@@ -2,8 +2,12 @@ import React, { useRef, useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useCompetition } from "../context/CompetitionContext";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Navbar() {
+  const { t } = useTranslation();
+
   const { token, user, logout } = useAuth();
   const { competitions = [], selectedCompetition, setSelectedCompetition } = useCompetition();
 
@@ -12,7 +16,7 @@ export default function Navbar() {
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const dropdownRef = useRef(); // separate ref for desktop dropdown
+  const dropdownRef = useRef();
 
   const hideNavbar = location.pathname === "/login" || location.pathname === "/register";
 
@@ -21,7 +25,6 @@ export default function Navbar() {
     setTimeout(() => navigate("/login"), 0);
   };
 
-  // Close dropdown if clicked outside
   useEffect(() => {
     const handler = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -33,40 +36,35 @@ export default function Navbar() {
   }, []);
 
   const currentCompetitionName =
-    competitions.find((c) => c.id === selectedCompetition)?.name || "Select Competition";
+    competitions.find((c) => c.id === selectedCompetition)?.name || t("select_competition");
 
   if (hideNavbar) return <div />;
 
   return (
     <nav className="bg-gray-800 text-white p-4 flex justify-between items-center relative">
-      {/* LEFT SIDE: Logo + Desktop Links */}
+      {/* LEFT SIDE */}
       <div className="flex items-center space-x-6">
         <Link to="/" className="flex items-center">
-          <img
-            src="/peyjabanki-bw-logo.png"
-            alt="Logo"
-            className="h-10 w-auto cursor-pointer"
-          />
+          <img src="/peyjabanki-bw-logo.png" alt="Logo" className="h-10 w-auto cursor-pointer" />
         </Link>
 
-        {/* Desktop Links */}
         <div className="hidden md:flex space-x-4 items-center">
-          <Link to="/matches" className="hover:underline">Matches</Link>
-          {token && <Link to="/scores" className="hover:underline">Leaderboard</Link>}
-          <Link to="/bonus" className="hover:underline">Bonus</Link>
+          <Link to="/matches" className="hover:underline">{t("matches")}</Link>
+          {token && <Link to="/scores" className="hover:underline">{t("leaderboard")}</Link>}
+          <Link to="/bonus" className="hover:underline">{t("bonus")}</Link>
           {token && user?.is_staff && (
             <>
-              <Link to="/adminscores" className="hover:underline">Admin Scores</Link>
-              <Link to="/admin/bonus" className="hover:underline">Admin Bonus</Link>
+              <Link to="/adminscores" className="hover:underline">{t("admin_scores")}</Link>
+              <Link to="/admin/bonus" className="hover:underline">{t("admin_bonus")}</Link>
             </>
           )}
         </div>
       </div>
 
-      {/* RIGHT SIDE: Desktop Competition + Auth + Mobile Hamburger */}
+      {/* RIGHT SIDE */}
       <div className="flex items-center space-x-4">
-        {/* Desktop Competition + Auth */}
         <div className="hidden md:flex items-center space-x-4" ref={dropdownRef}>
+          <LanguageSwitcher />
           {token && competitions.length > 0 && (
             <div className="relative">
               <button
@@ -75,7 +73,6 @@ export default function Navbar() {
               >
                 {currentCompetitionName}
               </button>
-
               {dropdownOpen && (
                 <div className="absolute right-0 mt-1 w-48 bg-white text-black border rounded shadow-lg z-50">
                   {competitions.map((c) => (
@@ -98,16 +95,16 @@ export default function Navbar() {
           )}
 
           {token ? (
-            <button onClick={handleLogout} className="hover:underline">Logout</button>
+            <button onClick={handleLogout} className="hover:underline">{t("logout")}</button>
           ) : (
             <>
-              <Link to="/login" className="hover:underline">Login</Link>
-              <Link to="/register" className="hover:underline">Register</Link>
+              <Link to="/login" className="hover:underline">{t("login")}</Link>
+              <Link to="/register" className="hover:underline">{t("register")}</Link>
             </>
           )}
         </div>
 
-        {/* Mobile Hamburger */}
+        {/* MOBILE HAMBURGER */}
         <button
           className="md:hidden bg-gray-700 px-3 py-1 rounded"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -119,13 +116,13 @@ export default function Navbar() {
       {/* MOBILE MENU */}
       {mobileMenuOpen && (
         <div className="absolute top-full left-0 w-full bg-gray-800 text-white p-4 space-y-3 md:hidden z-40">
-          <Link to="/matches" onClick={() => setMobileMenuOpen(false)} className="block">Matches</Link>
-          {token && <Link to="/scores" onClick={() => setMobileMenuOpen(false)} className="block">Leaderboard</Link>}
-          <Link to="/bonus" onClick={() => setMobileMenuOpen(false)} className="block">Bonus</Link>
+          <Link to="/matches" onClick={() => setMobileMenuOpen(false)} className="block">{t("matches")}</Link>
+          {token && <Link to="/scores" onClick={() => setMobileMenuOpen(false)} className="block">{t("leaderboard")}</Link>}
+          <Link to="/bonus" onClick={() => setMobileMenuOpen(false)} className="block">{t("bonus")}</Link>
           {token && user?.is_staff && (
             <>
-              <Link to="/adminscores" onClick={() => setMobileMenuOpen(false)} className="block">Admin Scores</Link>
-              <Link to="/admin/bonus" onClick={() => setMobileMenuOpen(false)} className="block">Admin Bonus</Link>
+              <Link to="/adminscores" onClick={() => setMobileMenuOpen(false)} className="block">{t("admin_scores")}</Link>
+              <Link to="/admin/bonus" onClick={() => setMobileMenuOpen(false)} className="block">{t("admin_bonus")}</Link>
             </>
           )}
 
@@ -137,7 +134,6 @@ export default function Navbar() {
               >
                 {currentCompetitionName}
               </button>
-
               {dropdownOpen && (
                 <div className="mt-1 w-full bg-white text-black border rounded shadow-lg z-50">
                   {competitions.map((c) => (
@@ -165,12 +161,12 @@ export default function Navbar() {
               onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
               className="block w-full text-left hover:underline"
             >
-              Logout
+              {t("logout")}
             </button>
           ) : (
             <>
-              <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="block">Login</Link>
-              <Link to="/register" onClick={() => setMobileMenuOpen(false)} className="block">Register</Link>
+              <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="block">{t("login")}</Link>
+              <Link to="/register" onClick={() => setMobileMenuOpen(false)} className="block">{t("register")}</Link>
             </>
           )}
         </div>

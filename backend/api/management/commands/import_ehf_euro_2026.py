@@ -93,70 +93,70 @@ class Command(BaseCommand):
                     match.group = row["group"]
                     match.save()
 
-                all_icelandic_players = [
-                    "Andri Már Rúnarsson",
-                    "Arnar Freyr Arnarsson",
-                    "Bjarki Már Elísson",
-                    "Björgvin Páll Gústavsson",
-                    "Einar Þorsteinn Ólafsson",
-                    "Elliði Snær Viðarsson",
-                    "Elvar Örn Jónsson",
-                    "Gísli Þorgeir Kristjánsson",
-                    "Haukur Þrastarsson",
-                    "Janus Daði Smárason",
-                    "Orri Freyr Þorkelsson",
-                    "Óðinn Þór Ríkharðsson",
-                    "Ómar Ingi Magnússon",
-                    "Teitur Örn Einarsson"
-                    "Viggó Kristjánsson",
-                    "Viktor Gísli Hallgrímsson",
-                    "Ýmir Örn Gíslason",
-                ]
+            all_icelandic_players = [
+                "Andri Már Rúnarsson",
+                "Arnar Freyr Arnarsson",
+                "Bjarki Már Elísson",
+                "Björgvin Páll Gústavsson",
+                "Einar Þorsteinn Ólafsson",
+                "Elliði Snær Viðarsson",
+                "Elvar Örn Jónsson",
+                "Gísli Þorgeir Kristjánsson",
+                "Haukur Þrastarsson",
+                "Janus Daði Smárason",
+                "Orri Freyr Þorkelsson",
+                "Óðinn Þór Ríkharðsson",
+                "Ómar Ingi Magnússon",
+                "Teitur Örn Einarsson"
+                "Viggó Kristjánsson",
+                "Viktor Gísli Hallgrímsson",
+                "Ýmir Örn Gíslason",
+            ]
 
-                all_teams = list(COUNTRY_CODES.keys())
+            all_teams = list(COUNTRY_CODES.keys())
 
-                bonus_question_data = [
-                    {
-                        "question": "1. sæti",
-                        "choices": all_teams,
-                    },
-                    {
-                        "question": "2. sæti",
-                        "choices": all_teams,
-                    },
-                    {
-                        "question": "3. sæti",
-                        "choices": all_teams,
-                    },
-                    {
-                        "question": "Markahæstur",
-                        "choices": all_icelandic_players,
-                    },
-                    {
-                        "question": "Flestar 2 mínútur",
-                        "choices": all_icelandic_players,
-                    },
-                    {
-                        "question": "Hversu mörg víti verja markmennirnir?",
-                        "choices": [str(i) for i in range(1, 10)] + ['10+']
-                    },
-                    {
-                        "question": "Hversu mörg rauð spjöld fáum við?",
-                        "choices": [str(i) for i in range(1, 10)] + ['10+']
-                    }
-                ]
-                for item in bonus_question_data:
-                    question, _ = BonusQuestion.objects.get_or_create(
-                        question=item['question'],
-                        competition=competition
+            bonus_question_data = [
+                {
+                    "question": "1. sæti",
+                    "choices": all_teams,
+                },
+                {
+                    "question": "2. sæti",
+                    "choices": all_teams,
+                },
+                {
+                    "question": "3. sæti",
+                    "choices": all_teams,
+                },
+                {
+                    "question": "Markahæstur",
+                    "choices": all_icelandic_players,
+                },
+                {
+                    "question": "Flestar 2 mínútur",
+                    "choices": all_icelandic_players,
+                },
+                {
+                    "question": "Hversu mörg víti verja markmennirnir?",
+                    "choices": [str(i) for i in range(1, 10)] + ['10+']
+                },
+                {
+                    "question": "Hversu mörg rauð spjöld fáum við?",
+                    "choices": [str(i) for i in range(1, 10)] + ['10+']
+                }
+            ]
+            for item in bonus_question_data:
+                question, _ = BonusQuestion.objects.get_or_create(
+                    question=item['question'],
+                    competition=competition
+                )
+
+                for choice_text in item["choices"]:
+                    choice, _ = BonusChoices.objects.get_or_create(choice=choice_text)
+
+                    BonusQuestionChoices.objects.get_or_create(
+                        question=question,
+                        choice=choice
                     )
-
-                    for choice_text in item["choices"]:
-                        choice, _ = BonusChoices.objects.get_or_create(choice=choice_text)
-
-                        BonusQuestionChoices.objects.get_or_create(
-                            question=question,
-                            choice=choice
-                        )
 
         self.stdout.write(self.style.SUCCESS("Teams (with country codes) and matches imported successfully."))
