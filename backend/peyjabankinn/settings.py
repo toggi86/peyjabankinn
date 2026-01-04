@@ -133,6 +133,7 @@ else:
     CSRF_TRUSTED_ORIGINS = [
         "https://peyjabanki.com",
     ]
+    CORS_ALLOW_CREDENTIALS = True
 
 
 
