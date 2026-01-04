@@ -116,7 +116,7 @@ export default function Navbar() {
       {/* MOBILE MENU */}
       {mobileMenuOpen && (
         <div className="absolute top-full left-0 w-full bg-gray-800 text-white p-4 space-y-3 md:hidden z-40">
-          <Link to="/matches" onClick={() => setMobileMenuOpen(false)} className="block">{t("matches")}</Link>
+          <Link to="/matches" onClick={() => setMobileMenuOpen(false)} className="block">{t("matches.title")}</Link>
           {token && <Link to="/scores" onClick={() => setMobileMenuOpen(false)} className="block">{t("leaderboard.title")}</Link>}
           <Link to="/bonus" onClick={() => setMobileMenuOpen(false)} className="block">{t("bonus")}</Link>
           {token && user?.is_staff && (
