@@ -94,10 +94,23 @@ class Command(BaseCommand):
                     match.save()
 
                 all_icelandic_players = [
-                    "Ómar",
-                    "Gísli",
-                    "Elliði",
-                    "Ýmir",
+                    "Andri Már Rúnarsson",
+                    "Arnar Freyr Arnarsson",
+                    "Bjarki Már Elísson",
+                    "Björgvin Páll Gústavsson",
+                    "Einar Þorsteinn Ólafsson",
+                    "Elliði Snær Viðarsson",
+                    "Elvar Örn Jónsson",
+                    "Gísli Þorgeir Kristjánsson",
+                    "Haukur Þrastarsson",
+                    "Janus Daði Smárason",
+                    "Orri Freyr Þorkelsson",
+                    "Óðinn Þór Ríkharðsson",
+                    "Ómar Ingi Magnússon",
+                    "Teitur Örn Einarsson"
+                    "Viggó Kristjánsson",
+                    "Viktor Gísli Hallgrímsson",
+                    "Ýmir Örn Gíslason",
                 ]
 
                 all_teams = list(COUNTRY_CODES.keys())
@@ -125,6 +138,10 @@ class Command(BaseCommand):
                     },
                     {
                         "question": "Hversu mörg víti verja markmennirnir?",
+                        "choices": [str(i) for i in range(1, 10)] + ['10+']
+                    },
+                    {
+                        "question": "Hversu mörg rauð spjöld fáum við?",
                         "choices": [str(i) for i in range(1, 10)] + ['10+']
                     }
                 ]
