@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://peyjabanki.com/api/",
+  baseURL: "https://peyjabanki.com/api/",
   withCredentials: true,
 });
 
