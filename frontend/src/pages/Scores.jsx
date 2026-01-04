@@ -52,17 +52,26 @@ export default function Scores() {
 
       {/* Desktop Table */}
       <div className="hidden md:block overflow-x-auto">
-        <table className="w-full border-collapse">
+        <table className="w-full border-collapse text-sm">
           <thead className="bg-gray-100 border-b">
-            <tr className="text-left text-sm">
-              <th className="p-3">#</th>
-              <th className="p-3">{t("leaderboard.player")}</th>
-              <th className="p-3 text-center font-bold">{t("leaderboard.total")}</th>
-              <th className="p-3 text-center">{t("leaderboard.matchPoints")}</th>
-              <th className="p-3 text-center">{t("leaderboard.bonusPoints")}</th>
-              <th className="p-3 text-center">{t("leaderboard.exact")}</th>
-              <th className="p-3 text-center">{t("leaderboard.oneScore")}</th>
-              <th className="p-3 text-center">{t("leaderboard.correctBonus")}</th>
+            {/* First row: groups */}
+            <tr>
+              <th className="p-2 border-r" rowSpan={2}>#</th>
+              <th className="p-2 border-r min-w-[100px]" rowSpan={2}>{t("leaderboard.player")}</th>
+
+              <th className="p-2 border-r text-center" rowSpan={2}>{t("leaderboard.total")}</th>
+
+              <th className="p-2 border-r text-center" colSpan={2}>{t("leaderboard.points")}</th>
+              <th className="p-2 border-r text-center" colSpan={3}>{t("leaderboard.stats")}</th>
+            </tr>
+
+            {/* Second row: individual columns */}
+            <tr className="bg-gray-50">
+              <th className="p-2 border-r text-center">{t("leaderboard.matchPoints")}</th>
+              <th className="p-2 border-r text-center">{t("leaderboard.bonusPoints")}</th>
+              <th className="p-2 border-r text-center">{t("leaderboard.exact")}</th>
+              <th className="p-2 border-r text-center">{t("leaderboard.oneScore")}</th>
+              <th className="p-2 text-center">{t("leaderboard.correctBonus")}</th>
             </tr>
           </thead>
 
@@ -70,27 +79,26 @@ export default function Scores() {
             {scores.map((row, i) => (
               <tr
                 key={row.user}
-                className={`border-b ${
-                  i < 3 ? "bg-amber-50" : "hover:bg-gray-50"
-                }`}
+                className={`border-b ${i < 3 ? "bg-amber-50" : "hover:bg-gray-50"}`}
               >
-                <td className="p-3 font-bold">{i + 1}</td>
-                <td className="p-3 font-medium">{row.user}</td>
-                <td className="p-3 text-center font-bold text-blue-700">
-                  {row.points}
-                </td>
-                <td className="p-3 text-center">{row.match_points}</td>
-                <td className="p-3 text-center text-purple-600 font-semibold">
-                  {row.bonus_points}
-                </td>
-                <td className="p-3 text-center">{row.exact}</td>
-                <td className="p-3 text-center">{row.one_score}</td>
-                <td className="p-3 text-center">{row.correct_bonus}</td>
+                <td className="p-2 border-r font-bold">{i + 1}</td>
+                <td className="p-2 border-r font-medium">{row.user}</td>
+                <td className="p-2 border-r text-center font-bold text-blue-700">{row.points}</td>
+
+                {/* Points */}
+                <td className="p-2 border-r text-center">{row.match_points}</td>
+                <td className="p-2 border-r text-center text-purple-600 font-semibold">{row.bonus_points}</td>
+
+                {/* Stats */}
+                <td className="p-2 border-r text-center">{row.exact}</td>
+                <td className="p-2 border-r text-center">{row.one_score}</td>
+                <td className="p-2 text-center">{row.correct_bonus}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
 
       {/* Mobile Cards */}
       <div className="md:hidden space-y-3">
@@ -101,42 +109,50 @@ export default function Scores() {
               i < 3 ? "bg-amber-50" : "bg-white"
             }`}
           >
-            <div className="flex justify-between mb-1">
-              <span className="font-bold">
-                {i + 1}. {row.user}
-              </span>
-              <span className="font-semibold text-blue-700">
-                {row.points}
-              </span>
+            {/* Player and Total */}
+            <div className="flex justify-between items-center mb-2">
+              <span className="font-bold">{i + 1}. {row.user}</span>
+              <span className="font-bold text-blue-700">{row.points}</span>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div className="flex justify-between">
-                <span>{t("leaderboard.matchPoints")}:</span>
-                <span>{row.match_points}</span>
+            {/* Points Section */}
+            <div className="mb-2">
+              <div className="font-semibold text-gray-600 text-xs mb-1">{t("leaderboard.points")}</div>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="flex justify-between">
+                  <span>{t("leaderboard.matchPoints")}</span>
+                  <span>{row.match_points}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>{t("leaderboard.bonusPoints")}</span>
+                  <span className="text-purple-600 font-semibold">{row.bonus_points}</span>
+                </div>
               </div>
-              <div className="flex justify-between">
-                <span>{t("leaderboard.bonusPoints")}:</span>
-                <span className="text-purple-600 font-semibold">
-                  {row.bonus_points}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span>{t("leaderboard.exact")}:</span>
-                <span>{row.exact}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>{t("leaderboard.oneScore")}:</span>
-                <span>{row.one_score}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>{t("leaderboard.correctBonus")}:</span>
-                <span>{row.correct_bonus}</span>
+            </div>
+
+            {/* Stats Section */}
+            <div>
+              <div className="font-semibold text-gray-600 text-xs mb-1">{t("leaderboard.stats")}</div>
+              <div className="grid grid-cols-3 gap-2 text-sm">
+                <div className="flex justify-between">
+                  <span>{t("leaderboard.exact")}</span>
+                  <span>{row.exact}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>{t("leaderboard.oneScore")}</span>
+                  <span>{row.one_score}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>{t("leaderboard.correctBonus")}</span>
+                  <span>{row.correct_bonus}</span>
+                </div>
               </div>
             </div>
           </div>
         ))}
       </div>
+
+
     </div>
   );
 }

@@ -43,7 +43,9 @@
     "total": "Total",
     "exact": "Both correct",
     "oneScore": "One correct",
-    "correctBonus": "Correct Bonus"
+    "correctBonus": "Correct Bonus",
+    "points": "Points",
+    "stats": "Statistics"
   },
   "frontpage": {
     "welcome": "Welcome!",

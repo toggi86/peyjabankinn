@@ -38,12 +38,14 @@
     "selectCompetition": "Veldu keppni",
     "loading": "Hleð stigatöflu...",
     "player": "Leikmaður",
-    "matchPoints": "Leikstig",
+    "matchPoints": "Stig úr leikjum",
     "bonusPoints": "Bónusstig",
     "total": "Samtals",
     "exact": "Báðar réttar",
     "oneScore": "Önnur rétt",
-    "correctBonus": "Réttur bónus"
+    "correctBonus": "Réttur bónus",
+    "points": "Stig",
+    "stats": "Tölfræði"
   },
   "frontpage": {
     "welcome": "Velkomin!",
