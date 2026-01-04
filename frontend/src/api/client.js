@@ -2,8 +2,10 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:8000/api/", // change if needed
+  baseURL: "https://peyjabanki.com/api/",
+  withCredentials: true,
 });
+
 
 // ------- REQUEST: Attach Access Token -------
 api.interceptors.request.use(config => {
