@@ -83,6 +83,14 @@
     "placeholderAway": "Úti",
     "selectCompetition": "Velja keppni",
     "errorSave": "Mistókst að vista spá fyrir þennan leik."
+  },
+  "bonus": {
+    "title": "Aukaspurningar",
+    "answeredOf": "Svarað {{answered}} af {{total}}",
+    "loading": "Hleð aukaspurningar…",
+    "selectCompetition": "Veldu keppni til að svara aukaspurningum.",
+    "submitError": "Mistókst að skila svari. Reyndu aftur.",
+    "forbidden": "Þessi aðgerð er ekki lengur leyfileg."
   }
 }
 

@@ -51,7 +51,7 @@ export default function Navbar() {
         <div className="hidden md:flex space-x-4 items-center">
           <Link to="/matches" className="hover:underline">{t("matches.title")}</Link>
           {token && <Link to="/scores" className="hover:underline">{t("leaderboard.title")}</Link>}
-          <Link to="/bonus" className="hover:underline">{t("bonus")}</Link>
+          <Link to="/bonus" className="hover:underline">{t("bonus.title")}</Link>
           {token && user?.is_staff && (
             <>
               <Link to="/adminscores" className="hover:underline">{t("admin_scores")}</Link>
@@ -118,7 +118,7 @@ export default function Navbar() {
         <div className="absolute top-full left-0 w-full bg-gray-800 text-white p-4 space-y-3 md:hidden z-40">
           <Link to="/matches" onClick={() => setMobileMenuOpen(false)} className="block">{t("matches.title")}</Link>
           {token && <Link to="/scores" onClick={() => setMobileMenuOpen(false)} className="block">{t("leaderboard.title")}</Link>}
-          <Link to="/bonus" onClick={() => setMobileMenuOpen(false)} className="block">{t("bonus")}</Link>
+          <Link to="/bonus" onClick={() => setMobileMenuOpen(false)} className="block">{t("bonus.title")}</Link>
           {token && user?.is_staff && (
             <>
               <Link to="/adminscores" onClick={() => setMobileMenuOpen(false)} className="block">{t("admin_scores")}</Link>

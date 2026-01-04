@@ -83,5 +83,13 @@
     "placeholderAway": "Away",
     "selectCompetition": "Select a competition",
     "errorSave": "Failed to save guess for this match."
+  },
+  "bonus": {
+    "title": "Bonus Questions",
+    "answeredOf": "Answered {{answered}} of {{total}}",
+    "loading": "Loading bonus questions…",
+    "selectCompetition": "Select a competition to answer bonus questions.",
+    "submitError": "Failed to submit answer. Please try again.",
+    "forbidden": "This action is no longer allowed."
   }
 }

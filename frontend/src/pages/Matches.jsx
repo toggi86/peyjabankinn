@@ -3,6 +3,7 @@ import api from "../api/client";
 import debounce from "lodash.debounce";
 import { useCompetition } from "../context/CompetitionContext";
 import { useTranslation } from "react-i18next";
+import { parseISO, format, compareAsc } from "date-fns";
 
 export default function Matches() {
   const { t } = useTranslation();
@@ -38,6 +39,11 @@ export default function Matches() {
         };
       });
 
+      // Sort by date ascending
+      merged.sort((a, b) =>
+        compareAsc(parseISO(a.match_date), parseISO(b.match_date))
+      );
+
       setMatches(merged);
     } catch (err) {
       console.error(err.response?.data || err.message);
@@ -54,15 +60,19 @@ export default function Matches() {
           `matches/?competition=${selectedCompetition}`
         );
         setMatches((prev) =>
-          prev.map((match) => {
-            const updated = res.data.find((m) => m.id === match.id);
-            if (!updated) return match;
-            return {
-              ...match,
-              home_score: updated.home_score,
-              away_score: updated.away_score,
-            };
-          })
+          prev
+            .map((match) => {
+              const updated = res.data.find((m) => m.id === match.id);
+              if (!updated) return match;
+              return {
+                ...match,
+                home_score: updated.home_score,
+                away_score: updated.away_score,
+              };
+            })
+            .sort((a, b) =>
+              compareAsc(parseISO(a.match_date), parseISO(b.match_date))
+            )
         );
       } catch (err) {
         console.error(err.response?.data || err.message);
@@ -146,8 +156,7 @@ export default function Matches() {
     } catch (err) {
       setErrors((prev) => ({
         ...prev,
-        [matchId]:
-          err.response?.data?.detail || t("matches.errorSave"),
+        [matchId]: err.response?.data?.detail || t("matches.errorSave"),
       }));
       console.error(err.response?.data || err.message);
     } finally {
@@ -165,34 +174,25 @@ export default function Matches() {
 
       {/* Desktop Table */}
       <div className="hidden md:block">
-        <div className="grid grid-cols-[80px_1fr_30px_40px_40px_30px_1fr_60px] gap-2 font-semibold text-sm mb-2 items-start">
-          <div className="whitespace-nowrap">{t("matches.date")}</div>
-          <div className="whitespace-nowrap truncate" title={t("matches.home")}>
-            {t("matches.homeShort")}
-          </div>
+        <div className="grid grid-cols-[100px_1fr_30px_50px_50px_30px_1fr_60px] gap-2 font-semibold text-sm mb-2 items-start">
+          <div>{t("matches.date")}</div>
+          <div>{t("matches.homeShort")}</div>
           <div></div>
-          <div className="whitespace-nowrap truncate" title={t("matches.homeGuess")}>
-            {t("matches.homeGuessShort")}
-          </div>
-          <div className="whitespace-nowrap truncate" title={t("matches.awayGuess")}>
-            {t("matches.awayGuessShort")}
-          </div>
+          <div>{t("matches.homeGuessShort")}</div>
+          <div>{t("matches.awayGuessShort")}</div>
           <div></div>
-          <div className="whitespace-nowrap truncate" title={t("matches.away")}>
-            {t("matches.awayShort")}
-          </div>
-          <div className="whitespace-nowrap">{t("matches.score")}</div>
+          <div>{t("matches.awayShort")}</div>
+          <div>{t("matches.score")}</div>
         </div>
 
         {matches.map((match) => (
           <div key={match.id}>
-            <div className="grid grid-cols-[80px_1fr_30px_40px_40px_30px_1fr_60px] items-start gap-2 border-b py-2 text-sm">
-              <div>{new Date(match.match_date).toLocaleString()}</div>
+            <div className="grid grid-cols-[100px_1fr_30px_50px_50px_30px_1fr_60px] items-center gap-2 border-b py-2 text-sm">
+              <div>{format(parseISO(match.match_date), "yyyy-MM-dd HH:mm")}</div>
 
               <div className="font-semibold truncate max-w-full" title={match.team_home.name}>
                 {match.team_home.name}
               </div>
-
               <div>
                 <img
                   src={match.team_home.flag_url}
@@ -254,12 +254,12 @@ export default function Matches() {
         ))}
       </div>
 
-      {/* Mobile Cards (unchanged) */}
+      {/* Mobile Cards */}
       <div className="md:hidden space-y-3">
         {matches.map((match) => (
           <div key={match.id} className="border rounded p-3 bg-white text-sm">
             <div className="text-xs text-gray-500 mb-1">
-              {new Date(match.match_date).toLocaleString()}
+              {format(parseISO(match.match_date), "yyyy-MM-dd HH:mm")}
             </div>
 
             <div className="flex justify-between items-center mb-2">
