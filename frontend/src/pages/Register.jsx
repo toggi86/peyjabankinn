@@ -1,66 +1,117 @@
 import React, { useEffect, useState } from "react";
-import api from "../api/client";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import api from "../api/client";
 import { useAuth } from "../context/AuthContext.jsx";
 
 const Register = () => {
-  const [form, setForm] = useState({ username: "", password: "", email: "" });
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { token } = useAuth();
 
+  const [form, setForm] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
   useEffect(() => {
-    if (token) navigate("/matches", { replace: true });
+    if (token) {
+      navigate("/matches", { replace: true });
+    }
   }, [token, navigate]);
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
+    setError("");
+
     try {
       await api.post("auth/register/", form);
       navigate("/login");
     } catch (err) {
-      alert("Registration failed");
+      setError(t("auth.register.error"));
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
-    <div className="max-w-sm mx-auto mt-12 bg-white p-6 rounded-xl shadow-md">
-      {/* Logo */}
-      <div className="flex justify-center mb-6">
-        <img src="/peyjabanki-bw-logo.png" alt="Peyjabanki" className="h-16 w-auto" />
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="w-full max-w-sm bg-white p-6 rounded-2xl shadow-lg">
+        {/* Logo */}
+        <div className="flex justify-center mb-6">
+          <img
+            src="/peyjabanki-bw-logo.png"
+            alt={t("common.brandName")}
+            className="h-14 w-auto"
+          />
+        </div>
+
+        <h1 className="text-3xl font-bold text-center mb-6">
+          {t("auth.register.title")}
+        </h1>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <input
+            name="username"
+            value={form.username}
+            placeholder={t("auth.register.username")}
+            onChange={handleChange}
+            autoComplete="username"
+            className="border rounded-lg px-3 py-2 focus:ring focus:ring-green-300 outline-none"
+          />
+
+          <input
+            name="email"
+            type="email"
+            value={form.email}
+            placeholder={t("auth.register.email")}
+            onChange={handleChange}
+            autoComplete="email"
+            className="border rounded-lg px-3 py-2 focus:ring focus:ring-green-300 outline-none"
+          />
+
+          <input
+            name="password"
+            type="password"
+            value={form.password}
+            placeholder={t("auth.register.password")}
+            onChange={handleChange}
+            autoComplete="new-password"
+            className="border rounded-lg px-3 py-2 focus:ring focus:ring-green-300 outline-none"
+          />
+
+          {error && (
+            <div className="text-sm text-red-600 text-center">
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className={`w-full py-2 rounded-lg font-semibold text-white transition ${
+              submitting
+                ? "bg-green-400 cursor-not-allowed"
+                : "bg-green-600 hover:bg-green-700"
+            }`}
+          >
+            {submitting
+              ? t("auth.register.submitting")
+              : t("auth.register.submit")}
+          </button>
+        </form>
       </div>
-
-      <h1 className="text-2xl font-bold text-center mb-4">Register</h1>
-
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <input
-          name="username"
-          placeholder="Username"
-          onChange={handleChange}
-          className="border p-2 rounded focus:ring focus:ring-blue-300 outline-none"
-        />
-        <input
-          name="email"
-          placeholder="Email"
-          onChange={handleChange}
-          className="border p-2 rounded focus:ring focus:ring-blue-300 outline-none"
-        />
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          onChange={handleChange}
-          className="border p-2 rounded focus:ring focus:ring-blue-300 outline-none"
-        />
-        <button
-          type="submit"
-          className="bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
-        >
-          Register
-        </button>
-      </form>
     </div>
   );
 };

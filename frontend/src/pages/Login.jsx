@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import api from "../api/client";
 import { useAuth } from "../context/AuthContext.jsx";
 
 const Login = () => {
   const navigate = useNavigate();
   const { token, login, loading } = useAuth();
+  const { t } = useTranslation();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -18,16 +20,19 @@ const Login = () => {
     }
   }, [token, loading, navigate]);
 
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     setError("");
 
     try {
-      const res = await api.post("auth/login/", { username, password });
+      const res = await api.post("auth/login/", {
+        username,
+        password,
+      });
       login(res.data.access, res.data.refresh);
-    } catch {
-      setError("Invalid username or password.");
+    } catch (err) {
+      setError(t("auth.login.error"));
     } finally {
       setSubmitting(false);
     }
@@ -35,53 +40,78 @@ const Login = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <p className="text-gray-500">Loading...</p>
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-gray-500">{t("common.loading")}</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-sm mx-auto mt-16 bg-white p-6 rounded-xl shadow-md">
-      {/* Logo */}
-      <div className="flex justify-center mb-6">
-        <img src="/peyjabanki-bw-logo.png" alt="Peyjabanki" className="h-16 w-auto" />
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="w-full max-w-sm bg-white p-6 rounded-2xl shadow-lg">
+        {/* Logo */}
+        <div className="flex justify-center mb-6">
+          <img
+            src="/peyjabanki-bw-logo.png"
+            alt={t("common.brandName")}
+            className="h-14 w-auto"
+          />
+        </div>
+
+        <h1 className="text-3xl font-bold text-center mb-6">
+          {t("auth.login.title")}
+        </h1>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <input
+            type="text"
+            placeholder={t("auth.login.username")}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            autoComplete="username"
+            className="border rounded-lg px-3 py-2 focus:ring focus:ring-blue-300 outline-none"
+          />
+
+          <input
+            type="password"
+            placeholder={t("auth.login.password")}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
+            className="border rounded-lg px-3 py-2 focus:ring focus:ring-blue-300 outline-none"
+          />
+
+          {error && (
+            <div className="text-sm text-red-600 text-center">
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className={`w-full py-2 rounded-lg font-semibold text-white transition ${
+              submitting
+                ? "bg-blue-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
+          >
+            {submitting
+              ? t("auth.login.loggingIn")
+              : t("auth.login.submit")}
+          </button>
+        </form>
+
+        <p className="text-sm text-center mt-5">
+          {t("auth.login.noAccount")}{" "}
+          <Link
+            to="/register"
+            className="text-blue-600 font-semibold hover:underline"
+          >
+            {t("auth.login.register")}
+          </Link>
+        </p>
       </div>
-
-      <h1 className="text-3xl font-bold text-center mb-5">Login</h1>
-
-      <form onSubmit={handleLogin} className="flex flex-col gap-4">
-        <input
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="border p-2 rounded focus:ring focus:ring-blue-300 outline-none"
-        />
-        <input
-          placeholder="Password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="border p-2 rounded focus:ring focus:ring-blue-300 outline-none"
-        />
-        {error && <div className="text-red-600 text-sm text-center">{error}</div>}
-        <button
-          type="submit"
-          disabled={submitting}
-          className={`py-2 rounded text-white transition font-semibold ${
-            submitting ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
-          }`}
-        >
-          {submitting ? "Logging in..." : "Login"}
-        </button>
-      </form>
-
-      <p className="text-sm text-center mt-4">
-        Don't have an account?
-        <Link className="text-blue-600 font-semibold ml-1" to="/register">
-          Register
-        </Link>
-      </p>
     </div>
   );
 };

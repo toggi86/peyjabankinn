@@ -2,17 +2,18 @@ import { useEffect, useState, useRef } from "react";
 import api from "../api/client";
 import debounce from "lodash.debounce";
 import { useCompetition } from "../context/CompetitionContext";
+import { useTranslation } from "react-i18next";
 
 export default function Matches() {
+  const { t } = useTranslation();
   const { selectedCompetition } = useCompetition();
 
   const [matches, setMatches] = useState([]);
   const [saving, setSaving] = useState({});
-  const [errors, setErrors] = useState({}); // per-match error
+  const [errors, setErrors] = useState({});
   const debouncedRefs = useRef({});
   const guessesByMatchId = useRef({});
 
-  // Fetch matches + guesses
   const fetchMatchesAndGuesses = async (competitionId) => {
     try {
       const [matchesRes, guessesRes] = await Promise.all([
@@ -43,10 +44,8 @@ export default function Matches() {
     }
   };
 
-  // Reload matches when competition changes
   useEffect(() => {
     if (!selectedCompetition) return;
-
     fetchMatchesAndGuesses(selectedCompetition);
 
     const interval = setInterval(async () => {
@@ -73,7 +72,6 @@ export default function Matches() {
     return () => clearInterval(interval);
   }, [selectedCompetition]);
 
-  // Clear per-match error automatically after 4 seconds
   useEffect(() => {
     const timers = Object.entries(errors).map(([matchId]) => {
       return setTimeout(() => {
@@ -88,7 +86,6 @@ export default function Matches() {
     return () => timers.forEach(clearTimeout);
   }, [errors]);
 
-  // Handle input changes with debounce
   const handleInputChange = (matchId, field, value) => {
     setMatches((prev) =>
       prev.map((m) => (m.id === matchId ? { ...m, [field]: value } : m))
@@ -104,7 +101,6 @@ export default function Matches() {
     debouncedRefs.current[matchId](updatedMatch);
   };
 
-  // Save guess to backend
   const saveGuess = async (match) => {
     if (!match) return;
     const matchId = match.id;
@@ -151,8 +147,7 @@ export default function Matches() {
       setErrors((prev) => ({
         ...prev,
         [matchId]:
-          err.response?.data?.detail ||
-          "Failed to save guess for this match.",
+          err.response?.data?.detail || t("matches.errorSave"),
       }));
       console.error(err.response?.data || err.message);
     } finally {
@@ -161,31 +156,43 @@ export default function Matches() {
   };
 
   if (!selectedCompetition) {
-    return <div className="text-center mt-10">Select a competition</div>;
+    return <div className="text-center mt-10">{t("matches.selectCompetition")}</div>;
   }
 
   return (
     <div className="max-w-5xl mx-auto mt-6">
-      <h1 className="text-xl font-bold mb-4">Matches</h1>
+      <h1 className="text-xl font-bold mb-4">{t("matches.title")}</h1>
 
       {/* Desktop Table */}
       <div className="hidden md:block">
-        <div className="grid grid-cols-[150px_150px_40px_50px_50px_40px_150px_80px] gap-2 font-semibold text-sm mb-2 items-start">
-          <div>Date</div>
-          <div>Home Team</div>
+        <div className="grid grid-cols-[80px_1fr_30px_40px_40px_30px_1fr_60px] gap-2 font-semibold text-sm mb-2 items-start">
+          <div className="whitespace-nowrap">{t("matches.date")}</div>
+          <div className="whitespace-nowrap truncate" title={t("matches.home")}>
+            {t("matches.homeShort")}
+          </div>
           <div></div>
-          <div>Home Guess</div>
-          <div>Away Guess</div>
+          <div className="whitespace-nowrap truncate" title={t("matches.homeGuess")}>
+            {t("matches.homeGuessShort")}
+          </div>
+          <div className="whitespace-nowrap truncate" title={t("matches.awayGuess")}>
+            {t("matches.awayGuessShort")}
+          </div>
           <div></div>
-          <div>Away Team</div>
-          <div>Score</div>
+          <div className="whitespace-nowrap truncate" title={t("matches.away")}>
+            {t("matches.awayShort")}
+          </div>
+          <div className="whitespace-nowrap">{t("matches.score")}</div>
         </div>
 
         {matches.map((match) => (
           <div key={match.id}>
-            <div className="grid grid-cols-[150px_150px_40px_50px_50px_40px_150px_80px] items-start gap-2 border-b py-2 text-sm">
+            <div className="grid grid-cols-[80px_1fr_30px_40px_40px_30px_1fr_60px] items-start gap-2 border-b py-2 text-sm">
               <div>{new Date(match.match_date).toLocaleString()}</div>
-              <div className="font-semibold">{match.team_home.name}</div>
+
+              <div className="font-semibold truncate max-w-full" title={match.team_home.name}>
+                {match.team_home.name}
+              </div>
+
               <div>
                 <img
                   src={match.team_home.flag_url}
@@ -201,6 +208,7 @@ export default function Matches() {
                   onChange={(e) =>
                     handleInputChange(match.id, "guess_home", e.target.value)
                   }
+                  placeholder={t("matches.placeholderHome")}
                   className="w-full border px-1 rounded text-center no-arrows"
                 />
               </div>
@@ -212,6 +220,7 @@ export default function Matches() {
                   onChange={(e) =>
                     handleInputChange(match.id, "guess_away", e.target.value)
                   }
+                  placeholder={t("matches.placeholderAway")}
                   className="w-full border px-1 rounded text-center no-arrows"
                 />
               </div>
@@ -224,17 +233,18 @@ export default function Matches() {
                 />
               </div>
 
-              <div className="font-semibold text-right">{match.team_away.name}</div>
+              <div className="font-semibold text-right truncate max-w-full" title={match.team_away.name}>
+                {match.team_away.name}
+              </div>
 
               <div className="text-gray-500 text-right">
                 ({match.home_score ?? "-"} - {match.away_score ?? "-"})
                 {saving[match.id] && (
-                  <span className="ml-2 text-gray-400 text-xs">saving…</span>
+                  <span className="ml-2 text-gray-400 text-xs">{t("matches.saving")}</span>
                 )}
               </div>
             </div>
 
-            {/* Desktop error row */}
             {errors[match.id] && (
               <div className="col-span-full text-red-600 text-sm bg-red-50 px-2 py-1 border-b border-red-200">
                 {errors[match.id]}
@@ -244,7 +254,7 @@ export default function Matches() {
         ))}
       </div>
 
-      {/* Mobile Cards */}
+      {/* Mobile Cards (unchanged) */}
       <div className="md:hidden space-y-3">
         {matches.map((match) => (
           <div key={match.id} className="border rounded p-3 bg-white text-sm">
@@ -259,7 +269,9 @@ export default function Matches() {
                   alt={match.team_home.name}
                   className="w-6 h-4"
                 />
-                <span className="font-semibold">{match.team_home.name}</span>
+                <span className="font-semibold truncate max-w-[120px]" title={match.team_home.name}>
+                  {match.team_home.name}
+                </span>
               </div>
 
               <span className="text-gray-500">
@@ -267,7 +279,9 @@ export default function Matches() {
               </span>
 
               <div className="flex items-center gap-2">
-                <span className="font-semibold">{match.team_away.name}</span>
+                <span className="font-semibold truncate max-w-[120px]" title={match.team_away.name}>
+                  {match.team_away.name}
+                </span>
                 <img
                   src={match.team_away.flag_url}
                   alt={match.team_away.name}
@@ -283,7 +297,7 @@ export default function Matches() {
                 onChange={(e) =>
                   handleInputChange(match.id, "guess_home", e.target.value)
                 }
-                placeholder="Home"
+                placeholder={t("matches.placeholderHome")}
                 className="border rounded px-2 py-1 text-center"
               />
 
@@ -293,13 +307,13 @@ export default function Matches() {
                 onChange={(e) =>
                   handleInputChange(match.id, "guess_away", e.target.value)
                 }
-                placeholder="Away"
+                placeholder={t("matches.placeholderAway")}
                 className="border rounded px-2 py-1 text-center"
               />
             </div>
 
             {saving[match.id] && (
-              <div className="text-xs text-gray-400 mt-1">saving…</div>
+              <div className="text-xs text-gray-400 mt-1">{t("matches.saving")}</div>
             )}
 
             {errors[match.id] && (

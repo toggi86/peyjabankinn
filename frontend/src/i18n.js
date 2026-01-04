@@ -2,23 +2,36 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 
-// Import translations
 import en from "./locales/en.json";
 import is from "./locales/is.json";
 
 i18n
-  .use(LanguageDetector) // detect user language
-  .use(initReactI18next) // pass i18n instance to react-i18next
+  .use(LanguageDetector)
+  .use(initReactI18next)
   .init({
     resources: {
       en: { translation: en },
       is: { translation: is },
     },
-    fallbackLng: "is",      // default language if detection fails
-    debug: true,            // set to false in production
+    fallbackLng: "is",
+    detection: {
+      order: ["localStorage"],
+      lookupLocalStorage: "language",
+      caches: ["localStorage"],
+    },
+    debug: true,
     interpolation: {
-      escapeValue: false,   // react already escapes values
+      escapeValue: false,
     },
   });
+
+i18n.on("initialized", () => {
+  const storedLang = localStorage.getItem("language");
+
+  if (!storedLang) {
+    i18n.changeLanguage("is");
+    localStorage.setItem("language", "is");
+  }
+});
 
 export default i18n;

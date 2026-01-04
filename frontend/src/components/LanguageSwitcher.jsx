@@ -9,7 +9,7 @@ const LanguageSwitcher = () => {
     localStorage.setItem("language", lng); // persist choice
   };
 
-  const currentLanguage = i18n.language || "en";
+  const currentLanguage = i18n.language?.split("-")[0] || "is";
 
   return (
     <div className="flex space-x-2 items-center">

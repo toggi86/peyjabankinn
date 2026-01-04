@@ -7,5 +7,83 @@
   "logout": "Útskrá",
   "login": "Innskráning",
   "register": "Nýskráning",
-  "select_competition": "Velja Keppni"
+  "select_competition": "Velja Keppni",
+  "common": {
+    "loading": "Hleð...",
+    "brandName": "Peyjabanki"
+  },
+  "auth": {
+    "login": {
+      "title": "Innskráning",
+      "username": "Notendanafn",
+      "password": "Lykilorð",
+      "submit": "Innskrá",
+      "loggingIn": "Skrái inn...",
+      "error": "Rangt notendanafn eða lykilorð.",
+      "noAccount": "Ertu ekki með aðgang?",
+      "register": "Nýskráning"
+    },
+    "register": {
+      "title": "Nýskráning",
+      "username": "Notendanafn",
+      "email": "Netfang",
+      "password": "Lykilorð",
+      "submit": "Nýskrá",
+      "submitting": "Skrái notanda...",
+      "error": "Nýskráning mistókst. Reyndu aftur."
+    }
+  },
+  "leaderboard": {
+    "title": "Stigatafla",
+    "selectCompetition": "Veldu keppni",
+    "loading": "Hleð stigatöflu...",
+    "player": "Leikmaður",
+    "matchPoints": "Leikstig",
+    "bonusPoints": "Bónusstig",
+    "total": "Samtals",
+    "exact": "Nákvæmt",
+    "oneScore": "1 stig",
+    "correctBonus": "Réttur bónus",
+    "totalGuesses": "Heildartilraunir",
+    "winPercentage": "Sigur %",
+    "avgPoints": "Meðalstig"
+  },
+  "frontpage": {
+    "welcome": "Velkomin!",
+    "welcomeUser": "Velkomin, {{username}}!",
+    "subtitle": "Tilbúin(n) að spá í leikina? Veldu svæði hér að neðan til að byrja.",
+    "cards": {
+      "matches": {
+        "title": "Leikir",
+        "description": "Skoðaðu leiki og skilaðu inn spám."
+      },
+      "leaderboard": {
+        "title": "Stigatafla",
+        "description": "Sjáðu hvernig þú stendur miðað við aðra leikmenn."
+      },
+      "bonus": {
+        "title": "Bónusspurningar",
+        "description": "Svaraðu sérstökum spurningum fyrir auka stig."
+      }
+    }
+  },
+  "matches": {
+    "title": "Leikir",
+    "date": "Dagsetning",
+    "home": "Heimalið",
+    "homeShort": "Heima",
+    "away": "Útilið",
+    "awayShort": "Úti",
+    "homeGuess": "Heimalið spá",
+    "homeGuessShort": "HS",
+    "awayGuess": "Útilið spá",
+    "awayGuessShort": "ÚS",
+    "score": "Stig",
+    "saving": "Skrái…",
+    "placeholderHome": "Heim",
+    "placeholderAway": "Úti",
+    "selectCompetition": "Velja keppni",
+    "errorSave": "Mistókst að vista spá fyrir þennan leik."
+  }
 }
+

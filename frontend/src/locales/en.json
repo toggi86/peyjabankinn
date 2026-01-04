@@ -7,5 +7,82 @@
   "logout": "Logout",
   "login": "Login",
   "register": "Register",
-  "select_competition": "Select Competition"
+  "select_competition": "Select Competition",
+  "common": {
+    "loading": "Loading...",
+    "brandName": "Peyjabanki"
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "username": "Username",
+      "password": "Password",
+      "submit": "Login",
+      "loggingIn": "Logging in...",
+      "error": "Invalid username or password.",
+      "noAccount": "Don't have an account?",
+      "register": "Register"
+    },
+    "register": {
+      "title": "Register",
+      "username": "Username",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Register",
+      "submitting": "Registering...",
+      "error": "Registration failed. Please try again."
+    }
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "selectCompetition": "Select a competition",
+    "loading": "Loading leaderboard...",
+    "player": "Player",
+    "matchPoints": "Match Pts",
+    "bonusPoints": "Bonus Pts",
+    "total": "Total",
+    "exact": "Exact",
+    "oneScore": "1 Score",
+    "correctBonus": "Correct Bonus",
+    "totalGuesses": "Total Guesses",
+    "winPercentage": "Win %",
+    "avgPoints": "Avg Pts"
+  },
+  "frontpage": {
+    "welcome": "Welcome!",
+    "welcomeUser": "Welcome, {{username}}!",
+    "subtitle": "Ready to make your predictions? Choose a section below to get started.",
+    "cards": {
+      "matches": {
+        "title": "Matches",
+        "description": "View matches and submit your predictions."
+      },
+      "leaderboard": {
+        "title": "Leaderboard",
+        "description": "See how you rank against other players."
+      },
+      "bonus": {
+        "title": "Bonus Questions",
+        "description": "Answer special questions for extra points."
+      }
+    }
+  },
+  "matches": {
+    "title": "Matches",
+    "date": "Date",
+    "home": "Home Team",
+    "homeShort": "Home",
+    "away": "Away Team",
+    "awayShort": "Away",
+    "homeGuess": "Home Guess",
+    "homeGuessShort": "HG",
+    "awayGuess": "Away Guess",
+    "awayGuessShort": "AG",
+    "score": "Score",
+    "saving": "Saving…",
+    "placeholderHome": "Home",
+    "placeholderAway": "Away",
+    "selectCompetition": "Select a competition",
+    "errorSave": "Failed to save guess for this match."
+  }
 }

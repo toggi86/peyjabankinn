@@ -45,12 +45,12 @@ export default function Navbar() {
       {/* LEFT SIDE */}
       <div className="flex items-center space-x-6">
         <Link to="/" className="flex items-center">
-          <img src="/peyjabanki-bw-logo.png" alt="Logo" className="h-10 w-auto cursor-pointer" />
+          <img src="/peyjabanki-bw-logo.png" alt={t("common.brandName")} className="h-10 w-auto cursor-pointer" />
         </Link>
 
         <div className="hidden md:flex space-x-4 items-center">
-          <Link to="/matches" className="hover:underline">{t("matches")}</Link>
-          {token && <Link to="/scores" className="hover:underline">{t("leaderboard")}</Link>}
+          <Link to="/matches" className="hover:underline">{t("matches.title")}</Link>
+          {token && <Link to="/scores" className="hover:underline">{t("leaderboard.title")}</Link>}
           <Link to="/bonus" className="hover:underline">{t("bonus")}</Link>
           {token && user?.is_staff && (
             <>
@@ -98,8 +98,8 @@ export default function Navbar() {
             <button onClick={handleLogout} className="hover:underline">{t("logout")}</button>
           ) : (
             <>
-              <Link to="/login" className="hover:underline">{t("login")}</Link>
-              <Link to="/register" className="hover:underline">{t("register")}</Link>
+              <Link to="/login" className="hover:underline">{t("auth.login.title")}</Link>
+              <Link to="/register" className="hover:underline">{t("auth.register.title")}</Link>
             </>
           )}
         </div>
@@ -117,7 +117,7 @@ export default function Navbar() {
       {mobileMenuOpen && (
         <div className="absolute top-full left-0 w-full bg-gray-800 text-white p-4 space-y-3 md:hidden z-40">
           <Link to="/matches" onClick={() => setMobileMenuOpen(false)} className="block">{t("matches")}</Link>
-          {token && <Link to="/scores" onClick={() => setMobileMenuOpen(false)} className="block">{t("leaderboard")}</Link>}
+          {token && <Link to="/scores" onClick={() => setMobileMenuOpen(false)} className="block">{t("leaderboard.title")}</Link>}
           <Link to="/bonus" onClick={() => setMobileMenuOpen(false)} className="block">{t("bonus")}</Link>
           {token && user?.is_staff && (
             <>
@@ -125,7 +125,7 @@ export default function Navbar() {
               <Link to="/admin/bonus" onClick={() => setMobileMenuOpen(false)} className="block">{t("admin_bonus")}</Link>
             </>
           )}
-
+          <LanguageSwitcher />
           {token && competitions.length > 0 && (
             <div className="relative">
               <button
@@ -165,8 +165,8 @@ export default function Navbar() {
             </button>
           ) : (
             <>
-              <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="block">{t("login")}</Link>
-              <Link to="/register" onClick={() => setMobileMenuOpen(false)} className="block">{t("register")}</Link>
+              <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="block">{t("auth.login.title")}</Link>
+              <Link to="/register" onClick={() => setMobileMenuOpen(false)} className="block">{t("auth.register.title")}</Link>
             </>
           )}
         </div>

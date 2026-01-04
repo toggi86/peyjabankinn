@@ -1,18 +1,18 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import api from "../api/client";
+import { useAuth } from "../context/AuthContext.jsx";
 
 const CompetitionContext = createContext();
 
 export const CompetitionProvider = ({ children }) => {
+  const { token, loading } = useAuth(); // <-- get token
   const [competitions, setCompetitions] = useState([]);
 
-  // Load selected competition from localStorage
   const [selectedCompetition, setSelectedCompetitionState] = useState(() => {
     const saved = localStorage.getItem("selectedCompetition");
     return saved ? Number(saved) : null;
   });
 
-  // Persist selection
   useEffect(() => {
     if (selectedCompetition !== null) {
       localStorage.setItem("selectedCompetition", selectedCompetition);
@@ -23,18 +23,18 @@ export const CompetitionProvider = ({ children }) => {
     setSelectedCompetitionState(id);
   };
 
-  // Fetch competitions from API
   useEffect(() => {
+    if (!token || loading) return; // <-- guard fetch
+
     api.get("competitions/")
       .then(res => {
         setCompetitions(res.data);
-        // Pick first competition if none selected yet
         if (!selectedCompetition && res.data.length > 0) {
           setSelectedCompetition(res.data[0].id);
         }
       })
       .catch(err => console.error(err));
-  }, []);
+  }, [token, loading]);
 
   return (
     <CompetitionContext.Provider
