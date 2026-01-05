@@ -21,7 +21,8 @@
       "loggingIn": "Logging in...",
       "error": "Invalid username or password.",
       "noAccount": "Don't have an account?",
-      "register": "Register"
+      "register": "Register",
+      "forgotPassword": "Forgot password?"
     },
     "register": {
       "title": "Register",
@@ -31,6 +32,30 @@
       "submit": "Register",
       "submitting": "Registering...",
       "error": "Registration failed. Please try again."
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email",
+      "submit": "Send Reset Email",
+      "sending": "Sending…",
+      "success": "Check your email for the reset link!",
+      "error": "Failed to send reset email. Please try again.",
+      "checkEmail": "Follow the instructions in the email to reset your password."
+    },
+    "resetPasswordConfirm": {
+      "title": "Set New Password",
+      "newPassword": "New Password",
+      "newPasswordPlaceholder": "Enter new password",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "Re-enter new password",
+      "submit": "Save Password",
+      "saving": "Saving…",
+      "success": "Password updated successfully!",
+      "redirecting": "Redirecting to login…",
+      "error": "Failed to reset password. Please try again.",
+      "invalidLink": "Invalid or expired password reset link.",
+      "passwordMismatch": "Passwords do not match."
     }
   },
   "leaderboard": {

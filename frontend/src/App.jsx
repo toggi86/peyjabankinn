@@ -11,6 +11,8 @@ import Register from "./pages/Register.jsx";
 import Matches from "./pages/Matches.jsx";
 import Scores from "./pages/Scores.jsx";
 import AdminScores from "./pages/AdminScores.jsx";
+import ResetPassword from "./pages/ResetPassword.jsx";
+import ResetPasswordConfirm from "./pages/ResetPasswordConfirm.jsx"
 
 function App() {
   return (
@@ -21,7 +23,8 @@ function App() {
         {/* Public routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/reset-password/confirm" element={<ResetPasswordConfirm />} />
         {/* Front page: logged-in users only */}
         <Route
           path="/"

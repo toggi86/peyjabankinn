@@ -11,6 +11,8 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - SECRET_KEY=${SECRET_KEY}
+      - SES_SMTP_USER=${SES_SMTP_USER}
+      - SES_SMTP_PASSWORD=${SES_SMTP_PASSWORD}
     volumes:
       - static_volume:/app/static
     depends_on:

@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'django_filters',
+    "django_rest_passwordreset",
 
     'accounts',
     'api',
@@ -119,10 +120,13 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 
+
 # --------------------
 # CORS
 # --------------------
 if DEBUG:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+    DEFAULT_FROM_EMAIL = "no-reply@example.com"
     ALLOWED_HOSTS = ['*']
     CORS_ALLOW_ALL_ORIGINS = True
     CORS_ALLOWED_ORIGINS = [
@@ -139,6 +143,15 @@ else:
         "https://peyjabanki.com",
     ]
     CORS_ALLOW_CREDENTIALS = True
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = "email-smtp.eu-west-1.amazonaws.com"
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+
+    EMAIL_HOST_USER = os.getenv("SES_SMTP_USER", '')
+    EMAIL_HOST_PASSWORD = os.getenv("SES_SMTP_PASSWORD", '')
+
+    DEFAULT_FROM_EMAIL = "Peyjabankinn <no-reply@peyjabanki.com>"
 
 
 

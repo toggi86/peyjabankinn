@@ -21,7 +21,8 @@
       "loggingIn": "Skrái inn...",
       "error": "Rangt notendanafn eða lykilorð.",
       "noAccount": "Ertu ekki með aðgang?",
-      "register": "Nýskráning"
+      "register": "Nýskráning",
+      "forgotPassword": "Gleymt lykilorð?"
     },
     "register": {
       "title": "Nýskráning",
@@ -31,6 +32,30 @@
       "submit": "Nýskrá",
       "submitting": "Skrái notanda...",
       "error": "Nýskráning mistókst. Reyndu aftur."
+    },
+    "resetPassword": {
+      "title": "Endurstilla lykilorð",
+      "email": "Netfang",
+      "emailPlaceholder": "Sláðu inn netfang",
+      "submit": "Senda endurstillingu",
+      "sending": "Sendir…",
+      "success": "Athugaðu pósthólfið fyrir hlekk til að endurstilla lykilorð!",
+      "error": "Ekki tókst að senda endurstillingu. Reyndu aftur.",
+      "checkEmail": "Fylgdu leiðbeiningum í tölvupóstinum til að endurstilla lykilorð."
+    },
+    "resetPasswordConfirm": {
+      "title": "Setja nýtt lykilorð",
+      "newPassword": "Nýtt lykilorð",
+      "newPasswordPlaceholder": "Sláðu inn nýtt lykilorð",
+      "confirmPassword": "Staðfesta lykilorð",
+      "confirmPasswordPlaceholder": "Sláðu inn aftur",
+      "submit": "Vista lykilorð",
+      "saving": "Vistar…",
+      "success": "Lykilorð uppfært!",
+      "redirecting": "Virkjun til innskráningar…",
+      "error": "Ekki tókst að endurstilla lykilorð. Reyndu aftur.",
+      "invalidLink": "Ógildur eða útrunninn hlekkur fyrir endurstillingu lykilorðs.",
+      "passwordMismatch": "Lykilorðin passa ekki saman."
     }
   },
   "leaderboard": {

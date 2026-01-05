@@ -80,6 +80,14 @@ const Login = () => {
             autoComplete="current-password"
             className="border rounded-lg px-3 py-2 focus:ring focus:ring-blue-300 outline-none"
           />
+          <div className="text-right text-sm mt-1">
+            <Link
+              to="/reset-password"
+              className="text-blue-600 hover:underline"
+            >
+              {t("auth.login.forgotPassword")}
+            </Link>
+          </div>
 
           {error && (
             <div className="text-sm text-red-600 text-center">
