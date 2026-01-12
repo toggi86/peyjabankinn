@@ -41,7 +41,7 @@ export default function Frontpage() {
         {/* Bank details */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-gray-800">
           <div>
-            <strong>{t("frontpage.info.amount")}:</strong> 5.000 ISK
+            <strong>{t("frontpage.info.amount")}:</strong> 3.000 ISK
           </div>
           <div>
             <strong>{t("frontpage.info.ssn")}:</strong> 120777-4759
