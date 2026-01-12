@@ -75,7 +75,17 @@
   "frontpage": {
     "welcome": "Velkomin!",
     "welcomeUser": "Velkomin, {{username}}!",
-    "subtitle": "Tilbúin(n) að spá í leikina? Veldu svæði hér að neðan til að byrja.",
+    "subtitle": "",
+    "info": {
+      "title": "Hvernig virkar þetta",
+      "description": "Peyjabankinn er frábær leikur sem gerir það ennþá skemmtilegra að fylgjast með stórmóti í handbolta.",
+      "paymentTitle": "Þátttaka og greiðslur",
+      "paymentDescription": "Þátttaka krefst inngöngugjalds. Greitt er með bankamillifærslu til skipuleggjanda keppninnar.",
+      "amount": "Upphæð",
+      "ssn": "Kennitala",
+      "account": "Reikningur",
+      "reference": "Skýring"
+    },
     "cards": {
       "matches": {
         "title": "Leikir",

@@ -16,20 +16,50 @@ export default function Frontpage() {
         className="h-28 mb-6 drop-shadow-md"
       />
 
-      {/* Welcome message */}
-      <h1 className="text-3xl font-bold text-gray-800 mb-2">
+      {/* Welcome */}
+      <h1 className="text-3xl font-bold text-gray-800 mb-2 text-center">
         {user
           ? t("frontpage.welcomeUser", { username: user.username })
           : t("frontpage.welcome")}
       </h1>
 
-      <p className="text-gray-600 text-center max-w-md mb-10">
-        {t("frontpage.subtitle")}
-      </p>
+      {/* Intro / payment info */}
+      <div className="w-full max-w-2xl bg-blue-50 border border-blue-200 rounded-xl p-5 mb-10 text-sm text-gray-700">
+        <p className="font-semibold mb-1">
+          {t("frontpage.info.title")}
+        </p>
+        <p className="mb-3">
+          {t("frontpage.info.description")}
+        </p>
+
+        <p className="font-semibold mb-1">
+          {t("frontpage.info.paymentTitle")}
+        </p>
+        <p>
+          {t("frontpage.info.paymentDescription")}
+        </p>
+        {/* Bank details */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-gray-800">
+          <div>
+            <strong>{t("frontpage.info.amount")}:</strong> 5.000 ISK
+          </div>
+          <div>
+            <strong>{t("frontpage.info.ssn")}:</strong> 120777-4759
+          </div>
+          <div>
+            <strong>{t("frontpage.info.account")}:</strong> 058-26-000763
+          </div>
+          {user && (
+            <div>
+              <strong>{t("frontpage.info.reference")}:</strong>{" "}
+              <span className="font-mono">{user.username}</span>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Action cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
-        {/* MATCHES */}
         <Link
           to="/matches"
           className="p-6 bg-white rounded-xl shadow hover:shadow-lg transition border text-center"
@@ -42,7 +72,6 @@ export default function Frontpage() {
           </p>
         </Link>
 
-        {/* LEADERBOARD */}
         <Link
           to="/scores"
           className="p-6 bg-white rounded-xl shadow hover:shadow-lg transition border text-center"
@@ -55,7 +84,6 @@ export default function Frontpage() {
           </p>
         </Link>
 
-        {/* BONUS QUESTIONS */}
         <Link
           to="/bonus"
           className="p-6 bg-white rounded-xl shadow hover:shadow-lg transition border text-center"

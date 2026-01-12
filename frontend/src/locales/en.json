@@ -75,7 +75,17 @@
   "frontpage": {
     "welcome": "Welcome!",
     "welcomeUser": "Welcome, {{username}}!",
-    "subtitle": "Ready to make your predictions? Choose a section below to get started.",
+    "subtitle": "",
+    "info": {
+      "title": "How it works",
+      "description": "Peyjabankinn is a friendly prediction game where you earn points for correct match results and bonus questions.",
+      "paymentTitle": "Participation & payment",
+      "paymentDescription": "Participation is organized per competition. Payment is handled outside the app via bank transfer.",
+      "amount": "Amount",
+      "ssn": "SSN",
+      "account": "Account",
+      "reference": "Reference"
+    },
     "cards": {
       "matches": {
         "title": "Matches",
