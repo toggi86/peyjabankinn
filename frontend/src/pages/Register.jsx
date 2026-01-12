@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import api from "../api/client";
 import { useAuth } from "../context/AuthContext.jsx";
 
-const Register = () => {
+export default function Register() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { token } = useAuth();
@@ -14,8 +14,9 @@ const Register = () => {
     email: "",
     password: "",
   });
+
+  const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     if (token) {
@@ -28,18 +29,25 @@ const Register = () => {
       ...prev,
       [e.target.name]: e.target.value,
     }));
+    setErrors((prev) => ({ ...prev, [e.target.name]: null }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-    setError("");
+    setErrors({});
 
     try {
       await api.post("auth/register/", form);
       navigate("/login");
     } catch (err) {
-      setError(t("auth.register.error"));
+      const data = err.response?.data;
+
+      if (data && typeof data === "object") {
+        setErrors(data); // DRF field errors
+      } else {
+        setErrors({ general: t("auth.register.error") });
+      }
     } finally {
       setSubmitting(false);
     }
@@ -53,7 +61,7 @@ const Register = () => {
           <img
             src="/peyjabanki-bw-logo.png"
             alt={t("common.brandName")}
-            className="h-14 w-auto"
+            className="h-14"
           />
         </div>
 
@@ -62,38 +70,60 @@ const Register = () => {
         </h1>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <input
-            name="username"
-            value={form.username}
-            placeholder={t("auth.register.username")}
-            onChange={handleChange}
-            autoComplete="username"
-            className="border rounded-lg px-3 py-2 focus:ring focus:ring-green-300 outline-none"
-          />
+          {/* Username */}
+          <div>
+            <input
+              name="username"
+              value={form.username}
+              placeholder={t("auth.register.username")}
+              onChange={handleChange}
+              className="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-green-300 outline-none"
+            />
+            {errors.username && (
+              <p className="text-xs text-red-600 mt-1">
+                {errors.username[0]}
+              </p>
+            )}
+          </div>
 
-          <input
-            name="email"
-            type="email"
-            value={form.email}
-            placeholder={t("auth.register.email")}
-            onChange={handleChange}
-            autoComplete="email"
-            className="border rounded-lg px-3 py-2 focus:ring focus:ring-green-300 outline-none"
-          />
+          {/* Email */}
+          <div>
+            <input
+              name="email"
+              type="email"
+              value={form.email}
+              placeholder={t("auth.register.email")}
+              onChange={handleChange}
+              className="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-green-300 outline-none"
+            />
+            {errors.email && (
+              <p className="text-xs text-red-600 mt-1">
+                {errors.email[0]}
+              </p>
+            )}
+          </div>
 
-          <input
-            name="password"
-            type="password"
-            value={form.password}
-            placeholder={t("auth.register.password")}
-            onChange={handleChange}
-            autoComplete="new-password"
-            className="border rounded-lg px-3 py-2 focus:ring focus:ring-green-300 outline-none"
-          />
+          {/* Password */}
+          <div>
+            <input
+              name="password"
+              type="password"
+              value={form.password}
+              placeholder={t("auth.register.password")}
+              onChange={handleChange}
+              className="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-green-300 outline-none"
+            />
+            {errors.password && (
+              <p className="text-xs text-red-600 mt-1">
+                {errors.password[0]}
+              </p>
+            )}
+          </div>
 
-          {error && (
+          {/* General error */}
+          {errors.general && (
             <div className="text-sm text-red-600 text-center">
-              {error}
+              {errors.general}
             </div>
           )}
 
@@ -114,6 +144,4 @@ const Register = () => {
       </div>
     </div>
   );
-};
-
-export default Register;
+}
