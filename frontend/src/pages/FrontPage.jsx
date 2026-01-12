@@ -47,7 +47,7 @@ export default function Frontpage() {
             <strong>{t("frontpage.info.ssn")}:</strong> 120777-4759
           </div>
           <div>
-            <strong>{t("frontpage.info.account")}:</strong> 058-26-000763
+            <strong>{t("frontpage.info.account")}:</strong> 0582-26-000763
           </div>
           {user && (
             <div>
