@@ -57,6 +57,19 @@ export default function Frontpage() {
           )}
         </div>
       </div>
+      {/* Rules / scoring */}
+      <div className="w-full max-w-2xl bg-white border rounded-xl p-5 mb-10 text-sm text-gray-700 shadow-sm">
+        <p className="font-semibold mb-3">
+          {t("frontpage.rules.title")}
+        </p>
+
+        <ul className="space-y-1">
+          <li>• {t("frontpage.rules.bonus")}</li>
+          <li>• {t("frontpage.rules.exact")}</li>
+          <li>• {t("frontpage.rules.resultPlusOne")}</li>
+          <li>• {t("frontpage.rules.result")}</li>
+        </ul>
+      </div>
 
       {/* Action cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">

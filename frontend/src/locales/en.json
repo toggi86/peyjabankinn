@@ -86,6 +86,13 @@
       "account": "Account",
       "reference": "Reference"
     },
+    "rules": {
+      "title": "Scoring rules",
+      "bonus": "Bonus question: 6 points for each correct",
+      "exact": "Both numbers correct: 5 points",
+      "resultPlusOne": "Correct result and one number correct: 3 points",
+      "result": "Correct result: 1 point"
+    },
     "cards": {
       "matches": {
         "title": "Matches",

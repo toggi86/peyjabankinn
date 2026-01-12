@@ -86,6 +86,13 @@
       "account": "Reikningur",
       "reference": "Skýring"
     },
+    "rules": {
+      "title": "Stigareglur",
+      "bonus": "Bónusspurning: 6 stig fyrir hverja rétta",
+      "exact": "Báðar tölur réttar: 5 stig",
+      "resultPlusOne": "Rétt úrslit og önnur talan rétt: 3 stig",
+      "result": "Rétt úrslit: 1 stig"
+    },
     "cards": {
       "matches": {
         "title": "Leikir",
