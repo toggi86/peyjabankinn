@@ -30,9 +30,8 @@ export default function ResetPasswordConfirm() {
 
     try {
       await api.post("auth/password-reset/confirm/", {
-        uid,
         token,
-        new_password: password
+        password
       });
       setSuccess(true);
       setTimeout(() => navigate("/login"), 3000);
