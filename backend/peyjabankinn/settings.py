@@ -137,9 +137,11 @@ else:
     CORS_ALLOW_ALL_ORIGINS = False
     CORS_ALLOWED_ORIGINS = [
         "https://peyjabanki.com",
+        "https://www.peyjabanki.com",
         "http://localhost:3000",
     ]
     CSRF_TRUSTED_ORIGINS = [
+        "https://www.peyjabanki.com",
         "https://peyjabanki.com",
     ]
     CORS_ALLOW_CREDENTIALS = True
