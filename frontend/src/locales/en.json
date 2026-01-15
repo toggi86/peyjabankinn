@@ -124,7 +124,9 @@
     "placeholderHome": "Home",
     "placeholderAway": "Away",
     "selectCompetition": "Select a competition",
-    "errorSave": "Failed to save guess for this match."
+    "errorSave": "Failed to save guess for this match.",
+    "fillRandom": "Randomize empty cells",
+    "confirmFillRandom": "Are you sure you want to randomize?"
   },
   "bonus": {
     "title": "Bonus Questions",

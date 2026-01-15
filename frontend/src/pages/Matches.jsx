@@ -15,6 +15,8 @@ export default function Matches() {
   const debouncedRefs = useRef({});
   const guessesByMatchId = useRef({});
   const [saved, setSaved] = useState({});
+  const randomScore = () => Math.floor(Math.random() * (35 - 25 + 1)) + 25;
+
 
 
   const fetchMatchesAndGuesses = async (competitionId) => {
@@ -112,6 +114,7 @@ export default function Matches() {
 
     debouncedRefs.current[matchId](updatedMatch);
   };
+
   const markSaved = (matchId) => {
     setSaved((prev) => ({ ...prev, [matchId]: true }));
 
@@ -122,6 +125,36 @@ export default function Matches() {
         return next;
       });
     }, 1500);
+  };
+
+  const fillRandomGuesses = () => {
+    if (!window.confirm(t("matches.confirmFillRandom"))) return;
+    matches.forEach((match) => {
+      const homeEmpty = match.guess_home === "" || match.guess_home === null;
+      const awayEmpty = match.guess_away === "" || match.guess_away === null;
+
+      if (!homeEmpty && !awayEmpty) return;
+
+      const updated = {
+        ...match,
+        guess_home: homeEmpty ? randomScore() : match.guess_home,
+        guess_away: awayEmpty ? randomScore() : match.guess_away,
+      };
+
+      // Update UI immediately
+      setMatches((prev) =>
+        prev.map((m) =>
+          m.id === match.id ? updated : m
+        )
+      );
+
+      // Reuse existing debounce + save logic
+      if (!debouncedRefs.current[match.id]) {
+        debouncedRefs.current[match.id] = debounce(saveGuess, 500);
+      }
+
+      debouncedRefs.current[match.id](updated);
+    });
   };
 
   const saveGuess = async (match) => {
@@ -183,7 +216,16 @@ export default function Matches() {
   }
 
   return (
+
     <div className="max-w-5xl mx-auto mt-6">
+      <div className="flex justify-end mb-3">
+        <button
+          onClick={fillRandomGuesses}
+          className="px-3 py-1.5 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 transition"
+        >
+          {t("matches.fillRandom")}
+        </button>
+      </div>
       <h1 className="text-xl font-bold mb-4">{t("matches.title")}</h1>
 
       {/* Desktop Table */}
