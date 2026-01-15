@@ -14,6 +14,8 @@ export default function Matches() {
   const [errors, setErrors] = useState({});
   const debouncedRefs = useRef({});
   const guessesByMatchId = useRef({});
+  const [saved, setSaved] = useState({});
+
 
   const fetchMatchesAndGuesses = async (competitionId) => {
     try {
@@ -110,6 +112,17 @@ export default function Matches() {
 
     debouncedRefs.current[matchId](updatedMatch);
   };
+  const markSaved = (matchId) => {
+    setSaved((prev) => ({ ...prev, [matchId]: true }));
+
+    setTimeout(() => {
+      setSaved((prev) => {
+        const next = { ...prev };
+        delete next[matchId];
+        return next;
+      });
+    }, 1500);
+  };
 
   const saveGuess = async (match) => {
     if (!match) return;
@@ -153,6 +166,7 @@ export default function Matches() {
             : m
         )
       );
+      markSaved(matchId);
     } catch (err) {
       setErrors((prev) => ({
         ...prev,
@@ -239,9 +253,23 @@ export default function Matches() {
 
               <div className="text-gray-500 text-right">
                 ({match.home_score ?? "-"} - {match.away_score ?? "-"})
-                {saving[match.id] && (
-                  <span className="ml-2 text-gray-400 text-xs">{t("matches.saving")}</span>
-                )}
+                <div className="ml-2 flex items-center gap-1">
+                  {saving[match.id] && (
+                    <span className="text-gray-400 text-xs">
+                      {t("matches.saving")}
+                    </span>
+                  )}
+
+                  <span
+                    className={`
+                      text-green-600 font-bold
+                      transition-opacity duration-500
+                      ${saved[match.id] ? "opacity-100" : "opacity-0"}
+                    `}
+                  >
+                    ✓
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -312,10 +340,23 @@ export default function Matches() {
               />
             </div>
 
-            {saving[match.id] && (
-              <div className="text-xs text-gray-400 mt-1">{t("matches.saving")}</div>
-            )}
+            <div className="flex items-center gap-2 mt-1">
+              {saving[match.id] && (
+                <span className="text-xs text-gray-400">
+                  {t("matches.saving")}
+                </span>
+              )}
 
+              <span
+                className={`
+                  text-green-600 font-bold
+                  transition-opacity duration-500
+                  ${saved[match.id] ? "opacity-100" : "opacity-0"}
+                `}
+              >
+                ✓
+              </span>
+            </div>
             {errors[match.id] && (
               <div className="text-red-600 text-xs mt-1">{errors[match.id]}</div>
             )}
