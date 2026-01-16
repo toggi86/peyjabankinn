@@ -12,12 +12,48 @@ export default function Matches() {
   const [matches, setMatches] = useState([]);
   const [saving, setSaving] = useState({});
   const [errors, setErrors] = useState({});
+  const [saved, setSaved] = useState({});
   const debouncedRefs = useRef({});
   const guessesByMatchId = useRef({});
-  const [saved, setSaved] = useState({});
   const randomScore = () => Math.floor(Math.random() * (35 - 25 + 1)) + 25;
 
+  const isAfterKickoff = (match) => new Date(match.match_date) <= new Date();
+  const isMatchFinished = (match) =>
+    match.score_home != null && match.score_away != null;
 
+  const getPoints = (match) => {
+    if (!isMatchFinished(match)) return null;
+    if (match.guess_home === "" || match.guess_away === "") return null;
+
+    const hs = Number(match.score_home);
+    const as = Number(match.score_away);
+    const gh = Number(match.guess_home);
+    const ga = Number(match.guess_away);
+
+    const exactHome = hs === gh;
+    const exactAway = as === ga;
+    const exactBoth = exactHome && exactAway;
+
+    const actualDiff = hs - as;
+    const guessDiff = gh - ga;
+    const sameResult =
+      (actualDiff > 0 && guessDiff > 0) ||
+      (actualDiff < 0 && guessDiff < 0) ||
+      (actualDiff === 0 && guessDiff === 0);
+
+    if (exactBoth) return 5;
+    if (sameResult && (exactHome || exactAway)) return 3;
+    if (sameResult) return 1;
+
+    return 0;
+  };
+
+  const pointsHighlightClass = (points) => {
+    if (points === 5) return "bg-red-100";
+    if (points === 3) return "bg-yellow-100";
+    if (points === 1) return "bg-green-100";
+    return "";
+  };
 
   const fetchMatchesAndGuesses = async (competitionId) => {
     try {
@@ -43,7 +79,6 @@ export default function Matches() {
         };
       });
 
-      // Sort by date ascending
       merged.sort((a, b) =>
         compareAsc(parseISO(a.match_date), parseISO(b.match_date))
       );
@@ -87,15 +122,15 @@ export default function Matches() {
   }, [selectedCompetition]);
 
   useEffect(() => {
-    const timers = Object.entries(errors).map(([matchId]) => {
-      return setTimeout(() => {
+    const timers = Object.entries(errors).map(([matchId]) =>
+      setTimeout(() => {
         setErrors((prev) => {
           const copy = { ...prev };
           delete copy[matchId];
           return copy;
         });
-      }, 4000);
-    });
+      }, 4000)
+    );
 
     return () => timers.forEach(clearTimeout);
   }, [errors]);
@@ -141,14 +176,10 @@ export default function Matches() {
         guess_away: awayEmpty ? randomScore() : match.guess_away,
       };
 
-      // Update UI immediately
       setMatches((prev) =>
-        prev.map((m) =>
-          m.id === match.id ? updated : m
-        )
+        prev.map((m) => (m.id === match.id ? updated : m))
       );
 
-      // Reuse existing debounce + save logic
       if (!debouncedRefs.current[match.id]) {
         debouncedRefs.current[match.id] = debounce(saveGuess, 500);
       }
@@ -166,10 +197,7 @@ export default function Matches() {
     const guessAway =
       match.guess_away !== "" ? Number(match.guess_away) : null;
 
-    if (
-      !guessesByMatchId.current[matchId] &&
-      (guessHome === null || guessAway === null)
-    )
+    if (!guessesByMatchId.current[matchId] && (guessHome === null || guessAway === null))
       return;
 
     const payload = { guess_home: guessHome, guess_away: guessAway };
@@ -178,7 +206,6 @@ export default function Matches() {
     try {
       const existingGuess = guessesByMatchId.current[matchId];
       let res;
-
       if (existingGuess?.id) {
         res = await api.patch(`guesses/${existingGuess.id}/`, payload);
       } else {
@@ -216,16 +243,21 @@ export default function Matches() {
   }
 
   return (
-
     <div className="max-w-5xl mx-auto mt-6">
       <div className="flex justify-end mb-3">
         <button
           onClick={fillRandomGuesses}
-          className="px-3 py-1.5 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 transition"
+          disabled={matches.every(isAfterKickoff)}
+          className={`px-3 py-1.5 text-sm rounded transition ${
+            matches.every(isAfterKickoff)
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-600 text-white hover:bg-blue-700"
+          }`}
         >
           {t("matches.fillRandom")}
         </button>
       </div>
+
       <h1 className="text-xl font-bold mb-4">{t("matches.title")}</h1>
 
       {/* Desktop Table */}
@@ -241,169 +273,133 @@ export default function Matches() {
           <div>{t("matches.score")}</div>
         </div>
 
-        {matches.map((match) => (
-          <div key={match.id}>
-            <div className="grid grid-cols-[100px_1fr_30px_50px_50px_30px_1fr_60px] items-center gap-2 border-b py-2 text-sm">
+        {matches.map((match) => {
+          const points = getPoints(match);
+          return (
+            <div
+              key={match.id}
+              className={`grid grid-cols-[100px_1fr_30px_50px_50px_30px_1fr_80px] items-center gap-2 border-b py-2 text-sm transition-colors ${
+                pointsHighlightClass(points)
+              }`}
+            >
               <div>{format(parseISO(match.match_date), "yyyy-MM-dd HH:mm")}</div>
-
               <div className="font-semibold truncate max-w-full" title={match.team_home.name}>
                 {match.team_home.name}
               </div>
               <div>
-                <img
-                  src={match.team_home.flag_url}
-                  alt={match.team_home.name}
-                  className="w-6 h-4"
-                />
+                <img src={match.team_home.flag_url} alt={match.team_home.name} className="w-6 h-4" />
               </div>
-
               <div>
                 <input
                   type="number"
                   value={match.guess_home}
-                  onChange={(e) =>
-                    handleInputChange(match.id, "guess_home", e.target.value)
-                  }
+                  disabled={isAfterKickoff(match)}
+                  onChange={(e) => handleInputChange(match.id, "guess_home", e.target.value)}
                   placeholder={t("matches.placeholderHome")}
-                  className="w-full border px-1 rounded text-center no-arrows"
+                  className={`w-full border px-1 rounded text-center no-arrows ${
+                    isAfterKickoff(match) ? "bg-gray-100 cursor-not-allowed text-gray-500" : ""
+                  }`}
                 />
               </div>
-
               <div>
                 <input
                   type="number"
                   value={match.guess_away}
-                  onChange={(e) =>
-                    handleInputChange(match.id, "guess_away", e.target.value)
-                  }
+                  disabled={isAfterKickoff(match)}
+                  onChange={(e) => handleInputChange(match.id, "guess_away", e.target.value)}
                   placeholder={t("matches.placeholderAway")}
-                  className="w-full border px-1 rounded text-center no-arrows"
+                  className={`w-full border px-1 rounded text-center no-arrows ${
+                    isAfterKickoff(match) ? "bg-gray-100 cursor-not-allowed text-gray-500" : ""
+                  }`}
                 />
               </div>
-
               <div>
-                <img
-                  src={match.team_away.flag_url}
-                  alt={match.team_away.name}
-                  className="w-6 h-4"
-                />
+                <img src={match.team_away.flag_url} alt={match.team_away.name} className="w-6 h-4" />
               </div>
-
               <div className="font-semibold text-right truncate max-w-full" title={match.team_away.name}>
                 {match.team_away.name}
               </div>
-
-              <div className="text-gray-500 text-right">
-                ({match.home_score ?? "-"} - {match.away_score ?? "-"})
+              <div className="flex justify-center items-center text-gray-500">
+                ({match.score_home ?? "-"} - {match.score_away ?? "-"})
                 <div className="ml-2 flex items-center gap-1">
-                  {saving[match.id] && (
-                    <span className="text-gray-400 text-xs">
-                      {t("matches.saving")}
-                    </span>
-                  )}
-
-                  <span
-                    className={`
-                      text-green-600 font-bold
-                      transition-opacity duration-500
-                      ${saved[match.id] ? "opacity-100" : "opacity-0"}
-                    `}
-                  >
+                  {saving[match.id] && <span className="text-gray-400 text-xs">{t("matches.saving")}</span>}
+                  <span className={`text-green-600 font-bold transition-opacity duration-500 ${
+                    saved[match.id] ? "opacity-100" : "opacity-0"
+                  }`}>
                     ✓
                   </span>
                 </div>
               </div>
             </div>
-
-            {errors[match.id] && (
-              <div className="col-span-full text-red-600 text-sm bg-red-50 px-2 py-1 border-b border-red-200">
-                {errors[match.id]}
-              </div>
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Mobile Cards */}
       <div className="md:hidden space-y-3">
-        {matches.map((match) => (
-          <div key={match.id} className="border rounded p-3 bg-white text-sm">
-            <div className="text-xs text-gray-500 mb-1">
-              {format(parseISO(match.match_date), "yyyy-MM-dd HH:mm")}
-            </div>
-
-            <div className="flex justify-between items-center mb-2">
-              <div className="flex items-center gap-2">
-                <img
-                  src={match.team_home.flag_url}
-                  alt={match.team_home.name}
-                  className="w-6 h-4"
-                />
-                <span className="font-semibold truncate max-w-[120px]" title={match.team_home.name}>
-                  {match.team_home.name}
-                </span>
+        {matches.map((match) => {
+          const points = getPoints(match);
+          return (
+            <div
+              key={match.id}
+              className={`border rounded p-3 text-sm transition-colors ${
+                pointsHighlightClass(points)
+              }`}
+            >
+              <div className="text-xs text-gray-500 mb-1">
+                {format(parseISO(match.match_date), "yyyy-MM-dd HH:mm")}
+              </div>
+              <div className="flex justify-between items-center mb-2">
+                <div className="flex items-center gap-2">
+                  <img src={match.team_home.flag_url} alt={match.team_home.name} className="w-6 h-4" />
+                  <span className="font-semibold truncate max-w-[120px]" title={match.team_home.name}>
+                    {match.team_home.name}
+                  </span>
+                </div>
+                <span className="text-gray-500">{match.score_home ?? "-"} : {match.score_away ?? "-"}</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold truncate max-w-[120px]" title={match.team_away.name}>
+                    {match.team_away.name}
+                  </span>
+                  <img src={match.team_away.flag_url} alt={match.team_away.name} className="w-6 h-4" />
+                </div>
               </div>
 
-              <span className="text-gray-500">
-                {match.home_score ?? "-"} : {match.away_score ?? "-"}
-              </span>
-
-              <div className="flex items-center gap-2">
-                <span className="font-semibold truncate max-w-[120px]" title={match.team_away.name}>
-                  {match.team_away.name}
-                </span>
-                <img
-                  src={match.team_away.flag_url}
-                  alt={match.team_away.name}
-                  className="w-6 h-4"
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  type="number"
+                  value={match.guess_home}
+                  disabled={isAfterKickoff(match)}
+                  onChange={(e) => handleInputChange(match.id, "guess_home", e.target.value)}
+                  placeholder={t("matches.placeholderHome")}
+                  className={`border rounded px-2 py-1 text-center ${
+                    isAfterKickoff(match) ? "bg-gray-100 cursor-not-allowed text-gray-500" : ""
+                  }`}
+                />
+                <input
+                  type="number"
+                  value={match.guess_away}
+                  disabled={isAfterKickoff(match)}
+                  onChange={(e) => handleInputChange(match.id, "guess_away", e.target.value)}
+                  placeholder={t("matches.placeholderAway")}
+                  className={`border rounded px-2 py-1 text-center ${
+                    isAfterKickoff(match) ? "bg-gray-100 cursor-not-allowed text-gray-500" : ""
+                  }`}
                 />
               </div>
-            </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              <input
-                type="number"
-                value={match.guess_home}
-                onChange={(e) =>
-                  handleInputChange(match.id, "guess_home", e.target.value)
-                }
-                placeholder={t("matches.placeholderHome")}
-                className="border rounded px-2 py-1 text-center"
-              />
-
-              <input
-                type="number"
-                value={match.guess_away}
-                onChange={(e) =>
-                  handleInputChange(match.id, "guess_away", e.target.value)
-                }
-                placeholder={t("matches.placeholderAway")}
-                className="border rounded px-2 py-1 text-center"
-              />
-            </div>
-
-            <div className="flex items-center gap-2 mt-1">
-              {saving[match.id] && (
-                <span className="text-xs text-gray-400">
-                  {t("matches.saving")}
+              <div className="flex items-center gap-2 mt-1">
+                {saving[match.id] && <span className="text-xs text-gray-400">{t("matches.saving")}</span>}
+                <span className={`text-green-600 font-bold transition-opacity duration-500 ${
+                  saved[match.id] ? "opacity-100" : "opacity-0"
+                }`}>
+                  ✓
                 </span>
-              )}
-
-              <span
-                className={`
-                  text-green-600 font-bold
-                  transition-opacity duration-500
-                  ${saved[match.id] ? "opacity-100" : "opacity-0"}
-                `}
-              >
-                ✓
-              </span>
+              </div>
+              {errors[match.id] && <div className="text-red-600 text-xs mt-1">{errors[match.id]}</div>}
             </div>
-            {errors[match.id] && (
-              <div className="text-red-600 text-xs mt-1">{errors[match.id]}</div>
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
