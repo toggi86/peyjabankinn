@@ -126,8 +126,7 @@
     "selectCompetition": "Velja keppni",
     "errorSave": "Mistókst að vista spá fyrir þennan leik.",
     "fillRandom": "Slembival á auða",
-    "confirmFillRandom": "Viltu nota slembival?",
-    "test": "test"
+    "confirmFillRandom": "Viltu nota slembival?"
   },
   "bonus": {
     "title": "Aukaspurningar",
