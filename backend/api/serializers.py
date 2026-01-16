@@ -46,7 +46,7 @@ class BonusQuestionSerializer(serializers.ModelSerializer):
 class CompetitionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Competition
-        fields = ["id", "name"]
+        fields = ["id", "name", "start_date"]
 
 
 class UserBonusAnswerSerializer(serializers.ModelSerializer):

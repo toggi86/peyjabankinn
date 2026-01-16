@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../api/client";
 import { useCompetition } from "../context/CompetitionContext";
 import { useTranslation } from "react-i18next";
+import { parseISO, isBefore } from "date-fns";
 
 export default function BonusQuestions() {
   const { t } = useTranslation();
@@ -11,8 +12,20 @@ export default function BonusQuestions() {
   const [answers, setAnswers] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [competitionStartDate, setCompetitionStartDate] = useState(null);
 
-  const load = async () => {
+  // Load competition start date
+  const loadCompetitionInfo = async () => {
+    if (!selectedCompetition) return;
+    try {
+      const res = await api.get(`competitions/${selectedCompetition}/`);
+      setCompetitionStartDate(parseISO(res.data.start_date));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const loadQuestions = async () => {
     if (!selectedCompetition) return;
     setLoading(true);
     setError(null);
@@ -41,7 +54,8 @@ export default function BonusQuestions() {
     setQuestions([]);
     setAnswers({});
     setError(null);
-    load();
+    loadCompetitionInfo();
+    loadQuestions();
   }, [selectedCompetition]);
 
   useEffect(() => {
@@ -50,8 +64,20 @@ export default function BonusQuestions() {
     return () => clearTimeout(timer);
   }, [error]);
 
+  // Check if competition has started
+  const hasCompetitionStarted = () => {
+    if (!competitionStartDate) return false;
+    return new Date() >= competitionStartDate;
+  };
+
   const submitAnswer = async (questionId, choiceId) => {
+    if (hasCompetitionStarted()) {
+      setError(t("bonus.forbidden")); // Optional: show message
+      return;
+    }
+
     setError(null);
+
     try {
       const existing = answers[questionId];
       let res;
