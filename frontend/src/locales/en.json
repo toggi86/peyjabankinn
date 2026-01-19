@@ -70,7 +70,10 @@
     "oneScore": "One correct",
     "correctBonus": "Correct Bonus",
     "points": "Points",
-    "stats": "Statistics"
+    "stats": "Statistics",
+    "yourPosition": "Your Position",
+    "pointsAbbr": "pts"
+
   },
   "frontpage": {
     "welcome": "Welcome!",

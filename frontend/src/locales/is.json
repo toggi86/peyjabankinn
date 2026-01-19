@@ -70,7 +70,9 @@
     "oneScore": "Önnur rétt",
     "correctBonus": "Réttur bónus",
     "points": "Stig",
-    "stats": "Tölfræði"
+    "stats": "Tölfræði",
+    "yourPosition": "Þín staða",
+    "pointsAbbr": "stig"
   },
   "frontpage": {
     "welcome": "Velkomin!",
