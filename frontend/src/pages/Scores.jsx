@@ -151,22 +151,15 @@ export default function Scores() {
         ))}
       </div>
 
-      {/* Fixed "Your Position" Card (mobile only, subtle) */}
+      {/* Fixed "Your Position" Card (mobile only, whole card clickable) */}
       {currentUser && myIndex !== -1 && (
         <div
-          className="fixed bottom-2 right-2 bg-blue-600 bg-opacity-80 text-white px-2 py-1 rounded-full shadow-lg flex items-center space-x-1 z-50 text-xs md:hidden backdrop-blur-sm"
-          style={{ maxWidth: "200px" }}
+          onClick={() => myRowRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })}
+          className="fixed bottom-2 right-2 bg-blue-600 bg-opacity-80 text-white px-3 py-1 rounded-full shadow-lg flex items-center space-x-2 z-50 text-xs md:hidden backdrop-blur-sm cursor-pointer hover:bg-opacity-100 transition"
+          style={{ maxWidth: "220px" }}
         >
-          <span className="truncate">
-            {t("leaderboard.yourPosition")} #{myIndex + 1} {currentUser}
-          </span>
+          <span className="truncate">{t("leaderboard.yourPosition")} #{myIndex + 1} {currentUser}</span>
           <span className="font-semibold">{scores[myIndex].points} {t("leaderboard.pointsAbbr")}</span>
-          <button
-            onClick={() => myRowRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })}
-            className="bg-white text-blue-600 px-1 py-0.5 rounded text-xs"
-          >
-            ⬆
-          </button>
         </div>
       )}
     </div>
