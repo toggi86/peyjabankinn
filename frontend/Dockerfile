@@ -3,14 +3,9 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Set CI environment to avoid npm prompts in CI
-ENV CI=true
-ENV NPM_CONFIG_PROGRESS=false
-ENV NPM_CONFIG_LOGLEVEL=error
-
 # Copy package files first for caching
 COPY package.json package-lock.json* ./
-RUN npm install --no-optional --silent
+RUN npm install
 
 # Copy source code
 COPY . .
