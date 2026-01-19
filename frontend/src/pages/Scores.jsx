@@ -116,7 +116,7 @@ export default function Scores() {
 
             {/* Points */}
             <div className="mb-2">
-              <div className="font-semibold text-gray-600 text-xs mb-1">Points</div>
+              <div className="font-semibold text-gray-600 text-xs mb-1">{t("leaderboard.points")}</div>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div className="flex justify-between">
                   <span>{t("leaderboard.matchPoints")}</span>
@@ -131,7 +131,7 @@ export default function Scores() {
 
             {/* Stats */}
             <div>
-              <div className="font-semibold text-gray-600 text-xs mb-1">Stats</div>
+              <div className="font-semibold text-gray-600 text-xs mb-1">{t("leaderboard.stats")}</div>
               <div className="grid grid-cols-3 gap-2 text-sm">
                 <div className="flex justify-between">
                   <span>{t("leaderboard.exact")}</span>
