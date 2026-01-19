@@ -15,6 +15,15 @@ export default function Scores() {
 
   const myRowRef = useRef(null);
 
+  // API key → translation key mapping
+  const keyMap = {
+    match_points: "matchPoints",
+    bonus_points: "bonusPoints",
+    exact: "exact",
+    one_score: "oneScore",
+    correct_bonus: "correctBonus",
+  };
+
   // Load scores
   const loadScores = async () => {
     if (!selectedCompetition) return;
@@ -101,7 +110,7 @@ export default function Scores() {
           <div
             key={row.user}
             ref={row.user === currentUser ? myRowRef : null}
-            className={`border rounded p-3 shadow-sm ${
+            className={`border rounded-lg p-3 shadow-sm ${
               row.user === currentUser
                 ? "bg-blue-100 ring-2 ring-blue-400"
                 : i < 3
@@ -109,23 +118,27 @@ export default function Scores() {
                 : "bg-white"
             }`}
           >
-            <div className="flex justify-between items-center mb-2">
-              <span className="font-bold">{i + 1}. {row.user}</span>
-              <span className="font-bold text-blue-700">{row.points}</span>
+            {/* Player & Total */}
+            <div className="flex justify-between items-center mb-3">
+              <span className="font-bold text-sm">{i + 1}. {row.user}</span>
+              <span className="font-bold text-blue-700 text-sm">{row.points} {t("leaderboard.pointsAbbr")}</span>
             </div>
 
             {/* Points */}
-            <div className="mb-2">
+            <div className="mb-3">
               <div className="font-semibold text-gray-600 text-xs mb-1">{t("leaderboard.points")}</div>
               <div className="grid grid-cols-2 gap-2 text-sm">
-                <div className="flex justify-between">
-                  <span>{t("leaderboard.matchPoints")}</span>
-                  <span>{row.match_points}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>{t("leaderboard.bonusPoints")}</span>
-                  <span className="text-purple-600 font-semibold">{row.bonus_points}</span>
-                </div>
+                {["match_points", "bonus_points"].map((key) => (
+                  <div
+                    key={key}
+                    className={`flex justify-between p-2 rounded ${row.user === currentUser ? "bg-blue-50" : "bg-gray-50"}`}
+                  >
+                    <span>{t(`leaderboard.${keyMap[key]}`)}</span>
+                    <span className={key === "bonus_points" ? "text-purple-600 font-semibold" : ""}>
+                      {row[key]}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -133,28 +146,25 @@ export default function Scores() {
             <div>
               <div className="font-semibold text-gray-600 text-xs mb-1">{t("leaderboard.stats")}</div>
               <div className="grid grid-cols-3 gap-2 text-sm">
-                <div className="flex justify-between">
-                  <span>{t("leaderboard.exact")}</span>
-                  <span>{row.exact}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>{t("leaderboard.oneScore")}</span>
-                  <span>{row.one_score}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>{t("leaderboard.correctBonus")}</span>
-                  <span>{row.correct_bonus}</span>
-                </div>
+                {["exact", "one_score", "correct_bonus"].map((key) => (
+                  <div
+                    key={key}
+                    className={`flex justify-between p-2 rounded ${row.user === currentUser ? "bg-blue-50" : "bg-gray-50"}`}
+                  >
+                    <span>{t(`leaderboard.${keyMap[key]}`)}</span>
+                    <span>{row[key]}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Fixed "Your Position" Card (mobile only, whole card clickable) */}
+      {/* Fixed "Your Position" Card (mobile only, clickable whole card) */}
       {currentUser && myIndex !== -1 && (
         <div
-          onClick={() => myRowRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })}
+          onClick={scrollToMyCard}
           className="fixed bottom-2 right-2 bg-blue-600 bg-opacity-80 text-white px-3 py-1 rounded-full shadow-lg flex items-center space-x-2 z-50 text-xs md:hidden backdrop-blur-sm cursor-pointer hover:bg-opacity-100 transition"
           style={{ maxWidth: "220px" }}
         >
