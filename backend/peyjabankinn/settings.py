@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_filters',
     "django_rest_passwordreset",
+    "import_export",
 
     'accounts',
     'api',
