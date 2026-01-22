@@ -7,7 +7,6 @@ from import_export.widgets import ForeignKeyWidget
 from .models import Game, Team, Competition
 
 class GameResource(resources.ModelResource):
-    # Lookup teams by their 'name' instead of ID
     team_home = fields.Field(
         column_name='team_home',
         attribute='team_home',
@@ -18,7 +17,6 @@ class GameResource(resources.ModelResource):
         attribute='team_away',
         widget=ForeignKeyWidget(Team, 'name')
     )
-    # Lookup competition by its 'short_name'
     competition = fields.Field(
         column_name='competition',
         attribute='competition',
@@ -27,7 +25,6 @@ class GameResource(resources.ModelResource):
 
     class Meta:
         model = Game
-        # Import matches based on these fields to avoid duplicates
         import_id_fields = ('team_home', 'team_away', 'match_date')
         fields = ('team_home', 'team_away', 'match_date', 'group', 'venue', 'competition')
 
@@ -38,9 +35,6 @@ class GameResource(resources.ModelResource):
         """
         raw_date = row.get('match_date')
         if raw_date:
-            # 1. Parse string to datetime object
             dt = datetime.datetime.fromisoformat(raw_date)
-            # 2. Set to local Danish time
             dt = dt.replace(tzinfo=ZoneInfo("Europe/Copenhagen"))
-            # 3. Convert to UTC
             row['match_date'] = dt.astimezone(ZoneInfo("UTC"))
