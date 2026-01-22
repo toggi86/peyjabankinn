@@ -136,16 +136,27 @@ if DEBUG:
     CORS_ALLOW_CREDENTIALS = True
 else:
     CORS_ALLOW_ALL_ORIGINS = False
+    CORS_ALLOW_CREDENTIALS = True
+
     CORS_ALLOWED_ORIGINS = [
         "https://peyjabanki.com",
         "https://www.peyjabanki.com",
-        "http://localhost:3000",
     ]
+
     CSRF_TRUSTED_ORIGINS = [
-        "https://www.peyjabanki.com",
         "https://peyjabanki.com",
+        "https://www.peyjabanki.com",
     ]
-    CORS_ALLOW_CREDENTIALS = True
+
+    SESSION_COOKIE_DOMAIN = ".peyjabanki.com"
+    CSRF_COOKIE_DOMAIN = ".peyjabanki.com"
+
+    CSRF_COOKIE_SAMESITE = "Lax"
+    SESSION_COOKIE_SAMESITE = "Lax"
+
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
     EMAIL_HOST = "email-smtp.eu-west-1.amazonaws.com"
     EMAIL_PORT = 587
